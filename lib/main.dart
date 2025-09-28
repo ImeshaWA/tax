@@ -9,7 +9,15 @@ import 'services/auth_service.dart'; // Add this import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await FirebaseAuth.instance.signOut();
+    print('User signed out');
+  } catch (e) {
+    print('Error: $e');
+  }
   runApp(const IncomeApp());
 }
 
@@ -27,6 +35,9 @@ class IncomeApp extends StatelessWidget {
       home: StreamBuilder<User?>(
         stream: AuthService.authStateChanges, // Use AuthService
         builder: (context, snapshot) {
+          print('Snapshot state: ${snapshot.connectionState}, hasData: ${snapshot.hasData}, user: ${snapshot.data?.uid}');
+          
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
