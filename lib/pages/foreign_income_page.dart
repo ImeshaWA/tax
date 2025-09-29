@@ -308,7 +308,7 @@ class _ForeignIncomePageState extends State<ForeignIncomePage>
           SizedBox(height: 20),
           IncomeField(
             controller: foreignTaxCtrl,
-            label: "Estimated Foreign Tax Credits Paid",
+            label: "Total Foreign Tax Credits Paid (Annual/Up to now)",
           ),
           SizedBox(height: 16),
           SizedBox(

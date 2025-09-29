@@ -524,6 +524,10 @@ class _EstimatedTaxPageState extends State<EstimatedTaxPage>
                               "Tax Liability (Foreign)",
                               taxService.annualForeignIncomeLiability(),
                             ),
+                            summaryRow(
+                              "Annual APIT",
+                              taxService.estimatedAPIT(),
+                            ),
                             Container(
                               height: 1,
                               margin: EdgeInsets.symmetric(vertical: 12),

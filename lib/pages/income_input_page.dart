@@ -1,5 +1,4 @@
 //pages/income_input_page.dart
-//pages/income_input_page.dart
 import 'package:flutter/material.dart';
 import '../services/income_calculator.dart';
 import '../widgets/income_field.dart';
@@ -38,6 +37,15 @@ class _IncomeInputPageState extends State<IncomeInputPage>
   late List<List<Map<String, TextEditingController>>> monthlyEmploymentCtrls;
   late List<List<Map<String, TextEditingController>>> monthlyBusinessCtrls;
   late List<List<TextEditingController>> monthlyDynamicCtrls;
+  late List<TextEditingController> monthlyApitCtrls; // Added for monthly APIT
+  final TextEditingController annualApitCtrl =
+      TextEditingController(); // Renamed for clarity
+  late List<TextEditingController>
+  monthlyRentBusinessIncomeCtrls; // Added for monthly rent income
+  late List<TextEditingController>
+  monthlyRentBusinessWhtCtrls; // Added for monthly rent WHT
+  late List<String>
+  monthlyRentMaintainedByUser; // Added for monthly maintained-by-user
 
   final List<String> employmentCategories = [
     "Salary / Wages",
@@ -63,7 +71,6 @@ class _IncomeInputPageState extends State<IncomeInputPage>
 
   late Map<String, TextEditingController> annualEmploymentCtrls;
   late Map<String, TextEditingController> annualBusinessCtrls;
-  final TextEditingController apitCtrl = TextEditingController();
   final TextEditingController rentBusinessIncomeCtrl = TextEditingController();
   final TextEditingController rentBusinessWhtCtrl = TextEditingController();
   String rentMaintainedByUser = "No";
@@ -107,6 +114,10 @@ class _IncomeInputPageState extends State<IncomeInputPage>
             .map((cat) => {cat: TextEditingController()})
             .toList(),
       );
+      monthlyApitCtrls = List.generate(
+        12,
+        (_) => TextEditingController(),
+      ); // Initialize monthly APIT controllers
     } else if (widget.incomeType == "Business") {
       annualBusinessCtrls = {
         for (var cat in businessCategories) cat: TextEditingController(),
@@ -117,6 +128,18 @@ class _IncomeInputPageState extends State<IncomeInputPage>
             .map((cat) => {cat: TextEditingController()})
             .toList(),
       );
+      monthlyRentBusinessIncomeCtrls = List.generate(
+        12,
+        (_) => TextEditingController(),
+      ); // Initialize monthly rent income controllers
+      monthlyRentBusinessWhtCtrls = List.generate(
+        12,
+        (_) => TextEditingController(),
+      ); // Initialize monthly rent WHT controllers
+      monthlyRentMaintainedByUser = List.generate(
+        12,
+        (_) => "No",
+      ); // Initialize monthly maintained-by-user
     } else {
       monthlyDynamicCtrls = List.generate(12, (_) => [TextEditingController()]);
     }
@@ -126,6 +149,18 @@ class _IncomeInputPageState extends State<IncomeInputPage>
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
+    annualApitCtrl.dispose(); // Dispose annual APIT controller
+    monthlyApitCtrls.forEach(
+      (ctrl) => ctrl.dispose(),
+    ); // Dispose monthly APIT controllers
+    monthlyRentBusinessIncomeCtrls.forEach(
+      (ctrl) => ctrl.dispose(),
+    ); // Dispose monthly rent income controllers
+    monthlyRentBusinessWhtCtrls.forEach(
+      (ctrl) => ctrl.dispose(),
+    ); // Dispose monthly rent WHT controllers
+    rentBusinessIncomeCtrl.dispose();
+    rentBusinessWhtCtrl.dispose();
     super.dispose();
   }
 
@@ -137,32 +172,58 @@ class _IncomeInputPageState extends State<IncomeInputPage>
 
   void saveIncome() async {
     double annual = 0.0;
+    double apitAmount = 0.0; // Added to store total APIT amount
+    double rentIncome = 0.0; // To store total rent income
+    double rentWht = 0.0; // To store total rent WHT
+    bool maintainedByUser = false; // To store maintained-by-user status
 
     if (selectedMode == "Annual") {
       if (widget.incomeType == "Employment") {
         annual = annualEmploymentCtrls.values
             .map((c) => double.tryParse(c.text) ?? 0.0)
             .fold(0.0, (a, b) => a + b);
+        apitAmount =
+            double.tryParse(annualApitCtrl.text) ??
+            0.0; // Use annual APIT controller
       } else if (widget.incomeType == "Business") {
         annual = annualBusinessCtrls.values
             .map((c) => double.tryParse(c.text) ?? 0.0)
             .fold(0.0, (a, b) => a + b);
-        final rentIncome = double.tryParse(rentBusinessIncomeCtrl.text) ?? 0.0;
-        final rentWht = double.tryParse(rentBusinessWhtCtrl.text) ?? 0.0;
+        rentIncome = double.tryParse(rentBusinessIncomeCtrl.text) ?? 0.0;
+        rentWht = double.tryParse(rentBusinessWhtCtrl.text) ?? 0.0;
+        maintainedByUser = rentMaintainedByUser == "Yes";
         service.rentBusinessIncome = rentIncome;
         service.rentBusinessWht = rentWht;
-        service.rentMaintainedByUser = rentMaintainedByUser == "Yes";
+        service.rentMaintainedByUser = maintainedByUser;
         annual += rentIncome;
       } else {
         annual = double.tryParse(annualCtrl.text) ?? 0.0;
       }
     } else {
       annual = getAnnualIncome();
+      if (widget.incomeType == "Employment") {
+        apitAmount = monthlyApitCtrls
+            .map((c) => double.tryParse(c.text) ?? 0.0)
+            .fold(0.0, (a, b) => a + b); // Sum monthly APIT amounts
+      } else if (widget.incomeType == "Business") {
+        rentIncome = monthlyRentBusinessIncomeCtrls
+            .map((c) => double.tryParse(c.text) ?? 0.0)
+            .fold(0.0, (a, b) => a + b); // Sum monthly rent income
+        rentWht = monthlyRentBusinessWhtCtrls
+            .map((c) => double.tryParse(c.text) ?? 0.0)
+            .fold(0.0, (a, b) => a + b); // Sum monthly rent WHT
+        maintainedByUser = monthlyRentMaintainedByUser.any(
+          (val) => val == "Yes",
+        ); // Use any "Yes" for maintained-by-user
+        service.rentBusinessIncome = rentIncome;
+        service.rentBusinessWht = rentWht;
+        service.rentMaintainedByUser = maintainedByUser;
+      }
     }
 
     if (widget.incomeType == "Employment") {
       service.totalEmploymentIncome = annual;
-      service.apitAmount = double.tryParse(apitCtrl.text) ?? 0.0;
+      service.apitAmount = apitAmount; // Store total APIT amount
     } else if (widget.incomeType == "Business") {
       service.totalBusinessIncome = annual;
     } else if (widget.incomeType == "Investment") {
@@ -255,7 +316,9 @@ class _IncomeInputPageState extends State<IncomeInputPage>
         });
         return sum + monthTotal;
       });
-      total += double.tryParse(rentBusinessIncomeCtrl.text) ?? 0.0;
+      total += monthlyRentBusinessIncomeCtrls
+          .map((c) => double.tryParse(c.text) ?? 0.0)
+          .fold(0.0, (a, b) => a + b); // Add sum of monthly rent income
       return total;
     } else {
       return IncomeCalculator.calculateAnnualDynamic(
@@ -409,6 +472,19 @@ class _IncomeInputPageState extends State<IncomeInputPage>
     const neutral300 = Color(0xFFdce5df);
     const neutral900 = Color(0xFF111714);
 
+    // Use monthly controllers/values in Monthly mode, otherwise use annual
+    final rentIncomeCtrl =
+        selectedMode == "Monthly" && selectedMonthIndex != null
+        ? monthlyRentBusinessIncomeCtrls[selectedMonthIndex!]
+        : rentBusinessIncomeCtrl;
+    final rentWhtCtrl = selectedMode == "Monthly" && selectedMonthIndex != null
+        ? monthlyRentBusinessWhtCtrls[selectedMonthIndex!]
+        : rentBusinessWhtCtrl;
+    final maintainedByUser =
+        selectedMode == "Monthly" && selectedMonthIndex != null
+        ? monthlyRentMaintainedByUser[selectedMonthIndex!]
+        : rentMaintainedByUser;
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 12),
       padding: EdgeInsets.all(20),
@@ -449,9 +525,19 @@ class _IncomeInputPageState extends State<IncomeInputPage>
             ],
           ),
           SizedBox(height: 16),
-          IncomeField(controller: rentBusinessIncomeCtrl, label: "Rent Income"),
+          IncomeField(
+            controller: rentIncomeCtrl,
+            label: selectedMode == "Monthly" && selectedMonthIndex != null
+                ? "Rent Income (${months[selectedMonthIndex!]})"
+                : "Rent Income",
+          ),
           SizedBox(height: 12),
-          IncomeField(controller: rentBusinessWhtCtrl, label: "WHT Amount"),
+          IncomeField(
+            controller: rentWhtCtrl,
+            label: selectedMode == "Monthly" && selectedMonthIndex != null
+                ? "WHT Amount (${months[selectedMonthIndex!]})"
+                : "WHT Amount",
+          ),
           SizedBox(height: 16),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -478,7 +564,7 @@ class _IncomeInputPageState extends State<IncomeInputPage>
                     border: Border.all(color: primaryColor.withOpacity(0.3)),
                   ),
                   child: DropdownButton<String>(
-                    value: rentMaintainedByUser,
+                    value: maintainedByUser,
                     underline: SizedBox(),
                     dropdownColor: Colors.white,
                     style: TextStyle(
@@ -491,8 +577,15 @@ class _IncomeInputPageState extends State<IncomeInputPage>
                               DropdownMenuItem(value: val, child: Text(val)),
                         )
                         .toList(),
-                    onChanged: (val) =>
-                        setState(() => rentMaintainedByUser = val ?? "No"),
+                    onChanged: (val) => setState(() {
+                      if (selectedMode == "Monthly" &&
+                          selectedMonthIndex != null) {
+                        monthlyRentMaintainedByUser[selectedMonthIndex!] =
+                            val ?? "No";
+                      } else {
+                        rentMaintainedByUser = val ?? "No";
+                      }
+                    }),
                   ),
                 ),
               ],
@@ -692,7 +785,10 @@ class _IncomeInputPageState extends State<IncomeInputPage>
                     ),
                   ),
                 ),
-                IncomeField(controller: apitCtrl, label: "APIT Amount"),
+                IncomeField(
+                  controller: annualApitCtrl,
+                  label: "APIT Amount",
+                ), // Use annual APIT controller
               ],
             )
           : widget.incomeType == "Business"
@@ -752,7 +848,11 @@ class _IncomeInputPageState extends State<IncomeInputPage>
                     ),
                   ),
                 ),
-                IncomeField(controller: apitCtrl, label: "APIT Amount"),
+                IncomeField(
+                  controller:
+                      monthlyApitCtrls[selectedMonthIndex!], // Use monthly APIT controller
+                  label: "APIT Amount (${months[selectedMonthIndex!]})",
+                ),
               ],
             )
           : widget.incomeType == "Business"
