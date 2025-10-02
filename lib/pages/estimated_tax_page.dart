@@ -615,7 +615,7 @@ class _EstimatedTaxPageState extends State<EstimatedTaxPage>
                                   Text(
                                     "Tax Payable",
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 19,
                                       fontWeight: FontWeight.bold,
                                       color: neutral900,
                                     ),

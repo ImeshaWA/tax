@@ -342,11 +342,13 @@ class InterestIncomePageState extends State<InterestIncomePage>
                       ),
                       child: Row(
                         children: [
-                          Text(
-                            "In which month was the relevant income received?",
-                            style: TextStyle(
-                              color: neutral900.withOpacity(0.7),
-                              fontWeight: FontWeight.w500,
+                          Flexible(
+                            child: Text(
+                              "Month income received?",
+                              style: TextStyle(
+                                color: neutral900.withOpacity(0.7),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           Spacer(),
@@ -404,21 +406,25 @@ class InterestIncomePageState extends State<InterestIncomePage>
               onPressed: onAdd,
               icon: Icon(Icons.add_circle_outline),
               label: Text("Add Another $title Account"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                elevation: 4,
-                shadowColor: primaryColor.withOpacity(0.3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ).copyWith(
-                backgroundColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
-                  if (states.contains(WidgetState.pressed)) return primaryDark;
-                  return primaryColor;
-                }),
-              ),
+              style:
+                  ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    elevation: 4,
+                    shadowColor: primaryColor.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ).copyWith(
+                    backgroundColor: WidgetStateProperty.resolveWith<Color?>((
+                      Set<WidgetState> states,
+                    ) {
+                      if (states.contains(WidgetState.pressed))
+                        return primaryDark;
+                      return primaryColor;
+                    }),
+                  ),
             ),
           ),
         ],
