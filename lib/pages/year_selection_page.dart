@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'mode_selection_page.dart';
 import '../services/tax_data_service.dart';
 
-
-
 import '../services/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

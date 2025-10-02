@@ -10,10 +10,7 @@ class TaxDataService {
   List<double> monthlyBusinessTotals = List.generate(12, (_) => 0.0);
   List<double> monthlyInvestmentTotals = List.generate(12, (_) => 0.0);
   List<double> monthlyForeignTotals = List.generate(12, (_) => 0.0);
-  List<double> monthlyOtherTotals = List.generate(
-    12,
-    (_) => 0.0,
-  ); // Added for monthly other totals
+  List<double> monthlyOtherTotals = List.generate(12, (_) => 0.0);
 
   String selectedTaxYear = "2024/2025";
 
@@ -80,6 +77,25 @@ class TaxDataService {
     "Rent for Business Purpose": 0.0,
   };
 
+  // Monthly Business Categories
+  List<Map<String, double>> monthlyBusinessCategories = List.generate(
+    12,
+    (_) => {
+      "Service Fees": 0.0,
+      "Sales of Trading Stock": 0.0,
+      "Capital Gains from Assets/Liabilities": 0.0,
+      "Realisation of Depreciable Assets": 0.0,
+      "Payments for Restrictions": 0.0,
+      "Other Business Income": 0.0,
+      "Rent for Business Purpose": 0.0,
+    },
+  );
+
+  // Monthly Rent Business Data
+  List<double> monthlyRentBusinessIncome = List.generate(12, (_) => 0.0);
+  List<double> monthlyRentBusinessWht = List.generate(12, (_) => 0.0);
+  List<String> monthlyRentMaintainedByUser = List.generate(12, (_) => "No");
+
   // Investment Categories
   Map<String, double> investmentCategories = {
     "Dividends": 0.0,
@@ -96,6 +112,22 @@ class TaxDataService {
     "Other Investments": 0.0,
   };
 
+  // Monthly Investment Categories
+  List<Map<String, List<double>>> monthlyInvestmentCategories = List.generate(
+    12,
+    (_) => {
+      "Dividends": [0.0],
+      "Discounts, Charges, Annuities": [0.0],
+      "Natural Resource Payments": [0.0],
+      "Premiums": [0.0],
+      "Royalties": [0.0],
+      "Gains from Selling Investment Assets": [0.0],
+      "Payments for Restricting Investment Activity": [0.0],
+      "Lottery, Betting, Gambling Winnings": [0.0],
+      "Other Investment": [0.0],
+    },
+  );
+
   // Foreign Income Categories
   Map<String, double> foreignIncomeCategories = {
     "Foreign Employment": 0.0,
@@ -103,6 +135,20 @@ class TaxDataService {
     "Foreign Investment": 0.0,
     "Foreign Other": 0.0,
   };
+
+  // Monthly Foreign Categories
+  List<Map<String, List<double>>> monthlyForeignCategories = List.generate(
+    12,
+    (_) => {
+      "Foreign Employment": [0.0],
+      "Foreign Business": [0.0],
+      "Foreign Investment": [0.0],
+      "Foreign Other": [0.0],
+    },
+  );
+
+  // Monthly Other Categories
+  List<List<double>> monthlyOtherCategories = List.generate(12, (_) => [0.0]);
 
   double apitAmount = 0.0;
   bool rentMaintainedByUser = false;
@@ -172,8 +218,15 @@ class TaxDataService {
       'employmentCategories': employmentCategories,
       'monthlyEmploymentCategories': monthlyEmploymentCategories,
       'businessCategories': businessCategories,
+      'monthlyBusinessCategories': monthlyBusinessCategories,
+      'monthlyRentBusinessIncome': monthlyRentBusinessIncome,
+      'monthlyRentBusinessWht': monthlyRentBusinessWht,
+      'monthlyRentMaintainedByUser': monthlyRentMaintainedByUser,
       'investmentCategories': investmentCategories,
+      'monthlyInvestmentCategories': monthlyInvestmentCategories,
       'foreignIncomeCategories': foreignIncomeCategories,
+      'monthlyForeignCategories': monthlyForeignCategories,
+      'monthlyOtherCategories': monthlyOtherCategories,
       'apitAmount': apitAmount,
       'rentMaintainedByUser': rentMaintainedByUser,
       'solarInstallCost': solarInstallCost,
@@ -185,7 +238,7 @@ class TaxDataService {
       'monthlyBusinessTotals': monthlyBusinessTotals,
       'monthlyInvestmentTotals': monthlyInvestmentTotals,
       'monthlyForeignTotals': monthlyForeignTotals,
-      'monthlyOtherTotals': monthlyOtherTotals, // Added for other totals
+      'monthlyOtherTotals': monthlyOtherTotals,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
