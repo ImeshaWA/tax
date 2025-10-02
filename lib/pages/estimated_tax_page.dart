@@ -1,6 +1,8 @@
 //pages/estimated_tax_page.dart
 import 'package:flutter/material.dart';
 import '../services/tax_computation_service.dart';
+import '../services/tax_data_service.dart';
+import 'quarterly_installments_page.dart'; // New import for the quarterly page
 
 class EstimatedTaxPage extends StatefulWidget {
   const EstimatedTaxPage({super.key});
@@ -321,6 +323,7 @@ class _EstimatedTaxPageState extends State<EstimatedTaxPage>
     const accentGreen = Color(0xFF10B981);
     const blueAccent = Color(0xFF1976D2);
     const orangeAccent = Color(0xFFFF6B35);
+    final taxDataService = TaxDataService();
 
     return Scaffold(
       body: Container(
@@ -344,6 +347,7 @@ class _EstimatedTaxPageState extends State<EstimatedTaxPage>
                 Container(
                   padding: EdgeInsets.all(20),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
@@ -370,7 +374,6 @@ class _EstimatedTaxPageState extends State<EstimatedTaxPage>
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,6 +398,40 @@ class _EstimatedTaxPageState extends State<EstimatedTaxPage>
                           ],
                         ),
                       ),
+                      if (taxDataService.selectedTaxYear == "2025/2026")
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => QuarterlyInstallmentsPage(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: accentGreen,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: accentGreen.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              "Quarterly",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

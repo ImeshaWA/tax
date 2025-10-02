@@ -1,10 +1,10 @@
 //pages/investment_income_page.dart
-//pages/investment_income_page.dart
+
 import 'package:flutter/material.dart';
-import 'income_input_page.dart';
-import 'rent_input_page.dart';
-import 'solar_income_page.dart';
-import 'interest_income_page.dart';
+import 'package:my_app/pages/rent_input_page.dart';
+import 'package:my_app/pages/solar_income_page.dart';
+import 'package:my_app/pages/interest_income_page.dart' as interest;
+import 'package:my_app/pages/income_input_page.dart' as income;
 
 class InvestmentIncomePage extends StatefulWidget {
   const InvestmentIncomePage({super.key});
@@ -23,7 +23,7 @@ class _InvestmentIncomePageState extends State<InvestmentIncomePage>
   late List<Animation<double>> _itemAnimations;
 
   final investmentTypes = [
-    "Dividends ",
+    "Dividends",
     "Discounts, Charges, Annuities",
     "Natural Resource Payments",
     "Rent Income",
@@ -39,7 +39,7 @@ class _InvestmentIncomePageState extends State<InvestmentIncomePage>
 
   // Investment type icons mapping
   final Map<String, IconData> investmentIcons = {
-    "Dividends ": Icons.trending_up_outlined,
+    "Dividends": Icons.trending_up_outlined,
     "Discounts, Charges, Annuities": Icons.percent_outlined,
     "Natural Resource Payments": Icons.nature_outlined,
     "Rent Income": Icons.home_outlined,
@@ -121,18 +121,16 @@ class _InvestmentIncomePageState extends State<InvestmentIncomePage>
         context,
         MaterialPageRoute(builder: (context) => const SolarIncomePage()),
       );
-    } else if (type == "Interest Income (Annual)" ||
-        type == "Interest Income (Monthly)" ||
-        type == "Interest Income") {
+    } else if (type == "Interest Income") {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const InterestIncomePage()),
+        MaterialPageRoute(builder: (context) => const interest.InterestIncomePage()),
       );
     } else {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => IncomeInputPage(incomeType: type),
+          builder: (context) => income.IncomeInputPage(incomeType: type),
         ),
       );
     }

@@ -1,5 +1,5 @@
 //pages/interest_income_page.dart
-//pages/interest_income_page.dart
+
 import 'package:flutter/material.dart';
 import '../services/tax_data_service.dart';
 import '../widgets/income_field.dart';
@@ -16,9 +16,25 @@ class InterestIncomePageState extends State<InterestIncomePage>
     with TickerProviderStateMixin {
   final TaxDataService service = TaxDataService();
 
-  // Each account holds 3 controllers: [interest, time period, WHT]
-  List<List<TextEditingController>> fixedDepositAccounts = [];
-  List<List<TextEditingController>> savingAccounts = [];
+  // List of months for dropdown
+  final List<String> months = [
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+    "January",
+    "February",
+    "March",
+  ];
+
+  // Each account holds: [interest controller, selected month, WHT controller]
+  List<List<dynamic>> fixedDepositAccounts = [];
+  List<List<dynamic>> savingAccounts = [];
 
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -51,12 +67,12 @@ class InterestIncomePageState extends State<InterestIncomePage>
     // Add one default account for each category
     fixedDepositAccounts.add([
       TextEditingController(),
-      TextEditingController(),
+      months[0], // Default to first month
       TextEditingController(),
     ]);
     savingAccounts.add([
       TextEditingController(),
-      TextEditingController(),
+      months[0], // Default to first month
       TextEditingController(),
     ]);
   }
@@ -65,16 +81,14 @@ class InterestIncomePageState extends State<InterestIncomePage>
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
-    // Dispose all controllers
+    // Dispose only interest and WHT controllers
     for (var acc in fixedDepositAccounts) {
-      for (var ctrl in acc) {
-        ctrl.dispose();
-      }
+      acc[0].dispose(); // Interest controller
+      acc[2].dispose(); // WHT controller
     }
     for (var acc in savingAccounts) {
-      for (var ctrl in acc) {
-        ctrl.dispose();
-      }
+      acc[0].dispose(); // Interest controller
+      acc[2].dispose(); // WHT controller
     }
     super.dispose();
   }
@@ -83,7 +97,7 @@ class InterestIncomePageState extends State<InterestIncomePage>
     setState(() {
       fixedDepositAccounts.add([
         TextEditingController(),
-        TextEditingController(),
+        months[0], // Default to first month
         TextEditingController(),
       ]);
     });
@@ -93,7 +107,7 @@ class InterestIncomePageState extends State<InterestIncomePage>
     setState(() {
       savingAccounts.add([
         TextEditingController(),
-        TextEditingController(),
+        months[0], // Default to first month
         TextEditingController(),
       ]);
     });
@@ -102,14 +116,31 @@ class InterestIncomePageState extends State<InterestIncomePage>
   void saveInterestIncome() async {
     double total = 0.0;
 
+    // Initialize monthly investment totals for the tax year 2025/2026
+    if (service.selectedTaxYear == "2025/2026") {
+      for (int i = 0; i < 12; i++) {
+        service.monthlyInvestmentTotals[i] = 0.0; // Reset to avoid accumulation
+      }
+    }
+
     // Fixed Deposit Income
     for (var acc in fixedDepositAccounts) {
-      total += double.tryParse(acc[0].text) ?? 0.0; // Interest Income
+      double amount = double.tryParse(acc[0].text) ?? 0.0;
+      total += amount;
+      if (service.selectedTaxYear == "2025/2026") {
+        int monthIndex = months.indexOf(acc[1]);
+        service.monthlyInvestmentTotals[monthIndex] += amount;
+      }
     }
 
     // Saving Account Income
     for (var acc in savingAccounts) {
-      total += double.tryParse(acc[0].text) ?? 0.0; // Interest Income
+      double amount = double.tryParse(acc[0].text) ?? 0.0;
+      total += amount;
+      if (service.selectedTaxYear == "2025/2026") {
+        int monthIndex = months.indexOf(acc[1]);
+        service.monthlyInvestmentTotals[monthIndex] += amount;
+      }
     }
 
     // Save to investment categories for WHT calculation
@@ -178,13 +209,14 @@ class InterestIncomePageState extends State<InterestIncomePage>
 
   Widget buildAccountSection(
     String title,
-    List<List<TextEditingController>> accounts,
+    List<List<dynamic>> accounts,
     VoidCallback onAdd,
   ) {
     const primaryColor = Color(0xFF38E07B);
     const primaryDark = Color(0xFF2DD96A);
     const accentGreen = Color(0xFF10B981);
     const neutral900 = Color(0xFF111714);
+    const neutral300 = Color(0xFFdce5df);
 
     return Container(
       margin: EdgeInsets.only(bottom: 24),
@@ -298,9 +330,61 @@ class InterestIncomePageState extends State<InterestIncomePage>
                       label: "$title ${index + 1} - Interest Income (Gross)",
                     ),
                     SizedBox(height: 12),
-                    IncomeField(
-                      controller: accounts[index][1],
-                      label: "$title ${index + 1} - Time Period",
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: neutral300),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            "In which month was the relevant income received?",
+                            style: TextStyle(
+                              color: neutral900.withOpacity(0.7),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Spacer(),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: primaryColor.withOpacity(0.3),
+                              ),
+                            ),
+                            child: DropdownButton<String>(
+                              value: accounts[index][1],
+                              underline: SizedBox(),
+                              dropdownColor: Colors.white,
+                              style: TextStyle(
+                                color: neutral900,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: months
+                                  .map(
+                                    (val) => DropdownMenuItem(
+                                      value: val,
+                                      child: Text(val),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (val) => setState(() {
+                                accounts[index][1] = val ?? months[0];
+                              }),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     SizedBox(height: 12),
                     IncomeField(
@@ -320,25 +404,21 @@ class InterestIncomePageState extends State<InterestIncomePage>
               onPressed: onAdd,
               icon: Icon(Icons.add_circle_outline),
               label: Text("Add Another $title Account"),
-              style:
-                  ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    elevation: 4,
-                    shadowColor: primaryColor.withOpacity(0.3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ).copyWith(
-                    backgroundColor: WidgetStateProperty.resolveWith<Color?>((
-                      Set<WidgetState> states,
-                    ) {
-                      if (states.contains(WidgetState.pressed))
-                        return primaryDark;
-                      return primaryColor;
-                    }),
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                elevation: 4,
+                shadowColor: primaryColor.withOpacity(0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ).copyWith(
+                backgroundColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                  if (states.contains(WidgetState.pressed)) return primaryDark;
+                  return primaryColor;
+                }),
+              ),
             ),
           ),
         ],

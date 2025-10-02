@@ -1,14 +1,21 @@
 //services/tax_data_service.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 
 class TaxDataService {
   static final TaxDataService _instance = TaxDataService._internal();
   factory TaxDataService() => _instance;
   TaxDataService._internal();
 
-  String selectedTaxYear = "2024/2025"; // Default value
+  List<double> monthlyEmploymentTotals = List.generate(12, (_) => 0.0);
+  List<double> monthlyBusinessTotals = List.generate(12, (_) => 0.0);
+  List<double> monthlyInvestmentTotals = List.generate(12, (_) => 0.0);
+  List<double> monthlyForeignTotals = List.generate(12, (_) => 0.0);
+  List<double> monthlyOtherTotals = List.generate(
+    12,
+    (_) => 0.0,
+  ); // Added for monthly other totals
+
+  String selectedTaxYear = "2024/2025";
 
   // Qualifying Payments
   double charity = 0.0;
@@ -45,6 +52,22 @@ class TaxDataService {
     "Benefits in Kind": 0.0,
     "Employee Share Schemes": 0.0,
   };
+
+  // Monthly Employment Categories
+  List<Map<String, double>> monthlyEmploymentCategories = List.generate(
+    12,
+    (_) => {
+      "Salary / Wages": 0.0,
+      "Allowances": 0.0,
+      "Expense Reimbursements": 0.0,
+      "Agreement Payments": 0.0,
+      "Termination Payments": 0.0,
+      "Retirement Contributions & Payments": 0.0,
+      "Payments on Your Behalf": 0.0,
+      "Benefits in Kind": 0.0,
+      "Employee Share Schemes": 0.0,
+    },
+  );
 
   // Business Categories
   Map<String, double> businessCategories = {
@@ -111,7 +134,6 @@ class TaxDataService {
     return rentRelief + solarPanel;
   }
 
-  // Calculate total investment income
   double calculateTotalInvestmentIncome() {
     double total = totalRentIncome + totalSolarIncome;
     total += investmentCategories.values.reduce((a, b) => a + b);
@@ -119,7 +141,6 @@ class TaxDataService {
     return total;
   }
 
-  // Calculate total foreign income
   double calculateTotalForeignIncome() {
     double total = foreignIncomeCategories.values.reduce((a, b) => a + b);
     totalForeignIncome = total;
@@ -127,40 +148,45 @@ class TaxDataService {
   }
 
   Map<String, dynamic> getAllDataAsMap() {
-  return {
-    'selectedTaxYear': selectedTaxYear,
-    'charity': charity,
-    'govDonations': govDonations,
-    'presidentsFund': presidentsFund,
-    'femaleShop': femaleShop,
-    'filmExpenditure': filmExpenditure,
-    'cinemaNew': cinemaNew,
-    'cinemaUpgrade': cinemaUpgrade,
-    'exemptIncome': exemptIncome,
-    'foreignTaxCredits': foreignTaxCredits,
-    'totalDomesticIncome': totalDomesticIncome,
-    'totalForeignIncome': totalForeignIncome,
-    'totalEmploymentIncome': totalEmploymentIncome,
-    'totalBusinessIncome': totalBusinessIncome,
-    'totalInvestmentIncome': totalInvestmentIncome,
-    'totalRentIncome': totalRentIncome,
-    'rentBusinessIncome': rentBusinessIncome,
-    'rentBusinessWht': rentBusinessWht,
-    'totalSolarIncome': totalSolarIncome,
-    'totalOtherIncome': totalOtherIncome,
-    'employmentCategories': employmentCategories,
-    'businessCategories': businessCategories,
-    'investmentCategories': investmentCategories,
-    'foreignIncomeCategories': foreignIncomeCategories,
-    'apitAmount': apitAmount,
-    'rentMaintainedByUser': rentMaintainedByUser,
-    'solarInstallCost': solarInstallCost,
-    'solarReliefCount': solarReliefCount,
-    'rentRelief': rentRelief,
-    'solarPanel': solarPanel,
-    'isMaintainedByUser': isMaintainedByUser,
-    'updatedAt': FieldValue.serverTimestamp(),  // Auto-add timestamp
-  };
-}
-
+    return {
+      'selectedTaxYear': selectedTaxYear,
+      'charity': charity,
+      'govDonations': govDonations,
+      'presidentsFund': presidentsFund,
+      'femaleShop': femaleShop,
+      'filmExpenditure': filmExpenditure,
+      'cinemaNew': cinemaNew,
+      'cinemaUpgrade': cinemaUpgrade,
+      'exemptIncome': exemptIncome,
+      'foreignTaxCredits': foreignTaxCredits,
+      'totalDomesticIncome': totalDomesticIncome,
+      'totalForeignIncome': totalForeignIncome,
+      'totalEmploymentIncome': totalEmploymentIncome,
+      'totalBusinessIncome': totalBusinessIncome,
+      'totalInvestmentIncome': totalInvestmentIncome,
+      'totalRentIncome': totalRentIncome,
+      'rentBusinessIncome': rentBusinessIncome,
+      'rentBusinessWht': rentBusinessWht,
+      'totalSolarIncome': totalSolarIncome,
+      'totalOtherIncome': totalOtherIncome,
+      'employmentCategories': employmentCategories,
+      'monthlyEmploymentCategories': monthlyEmploymentCategories,
+      'businessCategories': businessCategories,
+      'investmentCategories': investmentCategories,
+      'foreignIncomeCategories': foreignIncomeCategories,
+      'apitAmount': apitAmount,
+      'rentMaintainedByUser': rentMaintainedByUser,
+      'solarInstallCost': solarInstallCost,
+      'solarReliefCount': solarReliefCount,
+      'rentRelief': rentRelief,
+      'solarPanel': solarPanel,
+      'isMaintainedByUser': isMaintainedByUser,
+      'monthlyEmploymentTotals': monthlyEmploymentTotals,
+      'monthlyBusinessTotals': monthlyBusinessTotals,
+      'monthlyInvestmentTotals': monthlyInvestmentTotals,
+      'monthlyForeignTotals': monthlyForeignTotals,
+      'monthlyOtherTotals': monthlyOtherTotals, // Added for other totals
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+  }
 }

@@ -37,15 +37,11 @@ class _IncomeInputPageState extends State<IncomeInputPage>
   late List<List<Map<String, TextEditingController>>> monthlyEmploymentCtrls;
   late List<List<Map<String, TextEditingController>>> monthlyBusinessCtrls;
   late List<List<TextEditingController>> monthlyDynamicCtrls;
-  late List<TextEditingController> monthlyApitCtrls; // Added for monthly APIT
-  final TextEditingController annualApitCtrl =
-      TextEditingController(); // Renamed for clarity
-  late List<TextEditingController>
-  monthlyRentBusinessIncomeCtrls; // Added for monthly rent income
-  late List<TextEditingController>
-  monthlyRentBusinessWhtCtrls; // Added for monthly rent WHT
-  late List<String>
-  monthlyRentMaintainedByUser; // Added for monthly maintained-by-user
+  late List<TextEditingController> monthlyApitCtrls;
+  final TextEditingController annualApitCtrl = TextEditingController();
+  late List<TextEditingController> monthlyRentBusinessIncomeCtrls;
+  late List<TextEditingController> monthlyRentBusinessWhtCtrls;
+  late List<String> monthlyRentMaintainedByUser;
 
   final List<String> employmentCategories = [
     "Salary / Wages",
@@ -117,7 +113,7 @@ class _IncomeInputPageState extends State<IncomeInputPage>
       monthlyApitCtrls = List.generate(
         12,
         (_) => TextEditingController(),
-      ); // Initialize monthly APIT controllers
+      );
     } else if (widget.incomeType == "Business") {
       annualBusinessCtrls = {
         for (var cat in businessCategories) cat: TextEditingController(),
@@ -131,15 +127,15 @@ class _IncomeInputPageState extends State<IncomeInputPage>
       monthlyRentBusinessIncomeCtrls = List.generate(
         12,
         (_) => TextEditingController(),
-      ); // Initialize monthly rent income controllers
+      );
       monthlyRentBusinessWhtCtrls = List.generate(
         12,
         (_) => TextEditingController(),
-      ); // Initialize monthly rent WHT controllers
+      );
       monthlyRentMaintainedByUser = List.generate(
         12,
         (_) => "No",
-      ); // Initialize monthly maintained-by-user
+      );
     } else {
       monthlyDynamicCtrls = List.generate(12, (_) => [TextEditingController()]);
     }
@@ -149,42 +145,50 @@ class _IncomeInputPageState extends State<IncomeInputPage>
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
-    annualApitCtrl.dispose(); // Dispose annual APIT controller
-    monthlyApitCtrls.forEach(
-      (ctrl) => ctrl.dispose(),
-    ); // Dispose monthly APIT controllers
-    monthlyRentBusinessIncomeCtrls.forEach(
-      (ctrl) => ctrl.dispose(),
-    ); // Dispose monthly rent income controllers
-    monthlyRentBusinessWhtCtrls.forEach(
-      (ctrl) => ctrl.dispose(),
-    ); // Dispose monthly rent WHT controllers
+    annualCtrl.dispose();
+    annualApitCtrl.dispose();
+    monthlyApitCtrls.forEach((ctrl) => ctrl.dispose());
+    monthlyRentBusinessIncomeCtrls.forEach((ctrl) => ctrl.dispose());
+    monthlyRentBusinessWhtCtrls.forEach((ctrl) => ctrl.dispose());
     rentBusinessIncomeCtrl.dispose();
     rentBusinessWhtCtrl.dispose();
+    for (var monthList in monthlyEmploymentCtrls) {
+      for (var catMap in monthList) {
+        catMap.values.first.dispose();
+      }
+    }
+    for (var monthList in monthlyBusinessCtrls) {
+      for (var catMap in monthList) {
+        catMap.values.first.dispose();
+      }
+    }
+    for (var monthList in monthlyDynamicCtrls) {
+      for (var ctrl in monthList) {
+        ctrl.dispose();
+      }
+    }
+    annualEmploymentCtrls?.values.forEach((ctrl) => ctrl.dispose());
+    annualBusinessCtrls?.values.forEach((ctrl) => ctrl.dispose());
     super.dispose();
   }
 
   void addDynamicField(int monthIndex) {
-    setState(
-      () => monthlyDynamicCtrls[monthIndex].add(TextEditingController()),
-    );
+    setState(() => monthlyDynamicCtrls[monthIndex].add(TextEditingController()));
   }
 
   void saveIncome() async {
     double annual = 0.0;
-    double apitAmount = 0.0; // Added to store total APIT amount
-    double rentIncome = 0.0; // To store total rent income
-    double rentWht = 0.0; // To store total rent WHT
-    bool maintainedByUser = false; // To store maintained-by-user status
+    double apitAmount = 0.0;
+    double rentIncome = 0.0;
+    double rentWht = 0.0;
+    bool maintainedByUser = false;
 
     if (selectedMode == "Annual") {
       if (widget.incomeType == "Employment") {
         annual = annualEmploymentCtrls.values
             .map((c) => double.tryParse(c.text) ?? 0.0)
             .fold(0.0, (a, b) => a + b);
-        apitAmount =
-            double.tryParse(annualApitCtrl.text) ??
-            0.0; // Use annual APIT controller
+        apitAmount = double.tryParse(annualApitCtrl.text) ?? 0.0;
       } else if (widget.incomeType == "Business") {
         annual = annualBusinessCtrls.values
             .map((c) => double.tryParse(c.text) ?? 0.0)
@@ -204,26 +208,85 @@ class _IncomeInputPageState extends State<IncomeInputPage>
       if (widget.incomeType == "Employment") {
         apitAmount = monthlyApitCtrls
             .map((c) => double.tryParse(c.text) ?? 0.0)
-            .fold(0.0, (a, b) => a + b); // Sum monthly APIT amounts
+            .fold(0.0, (a, b) => a + b);
       } else if (widget.incomeType == "Business") {
         rentIncome = monthlyRentBusinessIncomeCtrls
             .map((c) => double.tryParse(c.text) ?? 0.0)
-            .fold(0.0, (a, b) => a + b); // Sum monthly rent income
+            .fold(0.0, (a, b) => a + b);
         rentWht = monthlyRentBusinessWhtCtrls
             .map((c) => double.tryParse(c.text) ?? 0.0)
-            .fold(0.0, (a, b) => a + b); // Sum monthly rent WHT
-        maintainedByUser = monthlyRentMaintainedByUser.any(
-          (val) => val == "Yes",
-        ); // Use any "Yes" for maintained-by-user
+            .fold(0.0, (a, b) => a + b);
+        maintainedByUser = monthlyRentMaintainedByUser.any((val) => val == "Yes");
         service.rentBusinessIncome = rentIncome;
         service.rentBusinessWht = rentWht;
         service.rentMaintainedByUser = maintainedByUser;
       }
     }
 
+    if (service.selectedTaxYear == "2025/2026" && selectedMode == "Monthly" && widget.incomeType == "Employment") {
+      for (int i = 0; i < 12; i++) {
+        double monthTotal = monthlyEmploymentCtrls[i].fold(
+            0.0, (sum, catMap) => sum + (double.tryParse(catMap.values.first.text) ?? 0.0));
+        service.monthlyEmploymentTotals[i] = monthTotal;
+      }
+    }
+    if (service.selectedTaxYear == "2025/2026" && selectedMode == "Monthly" && widget.incomeType == "Business") {
+      for (int i = 0; i < 12; i++) {
+        double monthTotal = monthlyBusinessCtrls[i].fold(
+            0.0, (sum, catMap) => sum + (double.tryParse(catMap.values.first.text) ?? 0.0));
+        monthTotal += double.tryParse(monthlyRentBusinessIncomeCtrls[i].text) ?? 0.0;
+        service.monthlyBusinessTotals[i] = monthTotal;
+      }
+    }
+    if (service.selectedTaxYear == "2025/2026" &&
+        selectedMode == "Monthly" &&
+        [
+          "Dividends",
+          "Discounts, Charges, Annuities",
+          "Natural Resource Payments",
+          "Premiums",
+          "Royalties",
+          "Gains from Selling Investment Assets",
+          "Payments for Restricting Investment Activity",
+          "Lottery, Betting, Gambling Winnings",
+          "Other Investment",
+        ].contains(widget.incomeType)) {
+      for (int i = 0; i < 12; i++) {
+        double monthTotal = monthlyDynamicCtrls[i]
+            .map((c) => double.tryParse(c.text) ?? 0.0)
+            .fold(0.0, (sum, value) => sum + value);
+        service.monthlyInvestmentTotals[i] += monthTotal;
+      }
+    }
+    if (service.selectedTaxYear == "2025/2026" &&
+        selectedMode == "Monthly" &&
+        [
+          "Foreign Employment",
+          "Foreign Business",
+          "Foreign Investment",
+          "Foreign Other",
+        ].contains(widget.incomeType)) {
+      for (int i = 0; i < 12; i++) {
+        double monthTotal = monthlyDynamicCtrls[i]
+            .map((c) => double.tryParse(c.text) ?? 0.0)
+            .fold(0.0, (sum, value) => sum + value);
+        service.monthlyForeignTotals[i] = monthTotal;
+      }
+    }
+    if (service.selectedTaxYear == "2025/2026" &&
+        selectedMode == "Monthly" &&
+        widget.incomeType == "Other") {
+      for (int i = 0; i < 12; i++) {
+        double monthTotal = monthlyDynamicCtrls[i]
+            .map((c) => double.tryParse(c.text) ?? 0.0)
+            .fold(0.0, (sum, value) => sum + value);
+        service.monthlyOtherTotals[i] = monthTotal;
+      }
+    }
+
     if (widget.incomeType == "Employment") {
       service.totalEmploymentIncome = annual;
-      service.apitAmount = apitAmount; // Store total APIT amount
+      service.apitAmount = apitAmount;
     } else if (widget.incomeType == "Business") {
       service.totalBusinessIncome = annual;
     } else if (widget.incomeType == "Investment") {
@@ -318,7 +381,7 @@ class _IncomeInputPageState extends State<IncomeInputPage>
       });
       total += monthlyRentBusinessIncomeCtrls
           .map((c) => double.tryParse(c.text) ?? 0.0)
-          .fold(0.0, (a, b) => a + b); // Add sum of monthly rent income
+          .fold(0.0, (a, b) => a + b);
       return total;
     } else {
       return IncomeCalculator.calculateAnnualDynamic(
@@ -472,18 +535,17 @@ class _IncomeInputPageState extends State<IncomeInputPage>
     const neutral300 = Color(0xFFdce5df);
     const neutral900 = Color(0xFF111714);
 
-    // Use monthly controllers/values in Monthly mode, otherwise use annual
     final rentIncomeCtrl =
         selectedMode == "Monthly" && selectedMonthIndex != null
-        ? monthlyRentBusinessIncomeCtrls[selectedMonthIndex!]
-        : rentBusinessIncomeCtrl;
+            ? monthlyRentBusinessIncomeCtrls[selectedMonthIndex!]
+            : rentBusinessIncomeCtrl;
     final rentWhtCtrl = selectedMode == "Monthly" && selectedMonthIndex != null
         ? monthlyRentBusinessWhtCtrls[selectedMonthIndex!]
         : rentBusinessWhtCtrl;
     final maintainedByUser =
         selectedMode == "Monthly" && selectedMonthIndex != null
-        ? monthlyRentMaintainedByUser[selectedMonthIndex!]
-        : rentMaintainedByUser;
+            ? monthlyRentMaintainedByUser[selectedMonthIndex!]
+            : rentMaintainedByUser;
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 12),
@@ -573,15 +635,12 @@ class _IncomeInputPageState extends State<IncomeInputPage>
                     ),
                     items: ["Yes", "No"]
                         .map(
-                          (val) =>
-                              DropdownMenuItem(value: val, child: Text(val)),
+                          (val) => DropdownMenuItem(value: val, child: Text(val)),
                         )
                         .toList(),
                     onChanged: (val) => setState(() {
-                      if (selectedMode == "Monthly" &&
-                          selectedMonthIndex != null) {
-                        monthlyRentMaintainedByUser[selectedMonthIndex!] =
-                            val ?? "No";
+                      if (selectedMode == "Monthly" && selectedMonthIndex != null) {
+                        monthlyRentMaintainedByUser[selectedMonthIndex!] = val ?? "No";
                       } else {
                         rentMaintainedByUser = val ?? "No";
                       }
@@ -620,127 +679,123 @@ class _IncomeInputPageState extends State<IncomeInputPage>
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnimation,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: Column(
-                children: [
-                  // Custom App Bar
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: primaryColor.withOpacity(0.2),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: primaryColor.withOpacity(0.2),
                             ),
-                            child: Icon(
-                              Icons.arrow_back_rounded,
-                              color: primaryColor,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${widget.incomeType} Income",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: neutral900,
-                                ),
-                              ),
-                              Text(
-                                "Enter your income details",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: accentGreen,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: Offset(0, 2),
                               ),
                             ],
                           ),
+                          child: Icon(
+                            Icons.arrow_back_rounded,
+                            color: primaryColor,
+                            size: 20,
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-
-                  _buildModeToggle(),
-                  if (selectedMode == "Monthly") _buildMonthSelector(),
-
-                  Expanded(
-                    child: selectedMode == "Annual"
-                        ? _buildAnnualView()
-                        : selectedMonthIndex != null
-                        ? _buildMonthlyView()
-                        : Center(
-                            child: Container(
-                              padding: EdgeInsets.all(32),
-                              margin: EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: primaryColor.withOpacity(0.2),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 15,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [primaryColor, accentGreen],
-                                      ),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.calendar_month_rounded,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    "Select a month to continue",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black54,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${widget.incomeType} Income",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: neutral900,
                               ),
                             ),
-                          ),
+                            Text(
+                              "Enter your income details",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: accentGreen,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+
+                _buildModeToggle(),
+                if (selectedMode == "Monthly") _buildMonthSelector(),
+
+                Expanded(
+                  child: selectedMode == "Annual"
+                      ? _buildAnnualView()
+                      : selectedMonthIndex != null
+                          ? _buildMonthlyView()
+                          : Center(
+                              child: Container(
+                                padding: EdgeInsets.all(32),
+                                margin: EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: primaryColor.withOpacity(0.2),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 15,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [primaryColor, accentGreen],
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.calendar_month_rounded,
+                                        color: Colors.white,
+                                        size: 32,
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      "Select a month to continue",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                ),
+              ],
             ),
           ),
         ),
@@ -788,33 +843,33 @@ class _IncomeInputPageState extends State<IncomeInputPage>
                 IncomeField(
                   controller: annualApitCtrl,
                   label: "APIT Amount",
-                ), // Use annual APIT controller
+                ),
               ],
             )
           : widget.incomeType == "Business"
-          ? Column(
-              children: [
-                ...annualBusinessCtrls.keys.map((label) {
-                  if (label == "Rent for Business Purpose")
-                    return _buildRentSection();
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: IncomeField(
-                      controller: annualBusinessCtrls[label]!,
-                      label: label,
+              ? Column(
+                  children: [
+                    ...annualBusinessCtrls.keys.map((label) {
+                      if (label == "Rent for Business Purpose")
+                        return _buildRentSection();
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12),
+                        child: IncomeField(
+                          controller: annualBusinessCtrls[label]!,
+                          label: label,
+                        ),
+                      );
+                    }),
+                  ],
+                )
+              : Column(
+                  children: [
+                    IncomeField(
+                      controller: annualCtrl,
+                      label: "${widget.incomeType} Income (Annual)",
                     ),
-                  );
-                }),
-              ],
-            )
-          : Column(
-              children: [
-                IncomeField(
-                  controller: annualCtrl,
-                  label: "${widget.incomeType} Income (Annual)",
+                  ],
                 ),
-              ],
-            ),
     );
   }
 
@@ -849,57 +904,56 @@ class _IncomeInputPageState extends State<IncomeInputPage>
                   ),
                 ),
                 IncomeField(
-                  controller:
-                      monthlyApitCtrls[selectedMonthIndex!], // Use monthly APIT controller
+                  controller: monthlyApitCtrls[selectedMonthIndex!],
                   label: "APIT Amount (${months[selectedMonthIndex!]})",
                 ),
               ],
             )
           : widget.incomeType == "Business"
-          ? Column(
-              children: [
-                ...monthlyBusinessCtrls[selectedMonthIndex!].map((catMap) {
-                  final label = catMap.keys.first;
-                  final ctrl = catMap.values.first;
-                  if (label == "Rent for Business Purpose")
-                    return _buildRentSection();
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: IncomeField(controller: ctrl, label: label),
-                  );
-                }),
-              ],
-            )
-          : Column(
-              children: [
-                ...List.generate(
-                  monthlyDynamicCtrls[selectedMonthIndex!].length,
-                  (j) => Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: IncomeField(
-                      controller: monthlyDynamicCtrls[selectedMonthIndex!][j],
-                      label: "${widget.incomeType} ${j + 1}",
+              ? Column(
+                  children: [
+                    ...monthlyBusinessCtrls[selectedMonthIndex!].map((catMap) {
+                      final label = catMap.keys.first;
+                      final ctrl = catMap.values.first;
+                      if (label == "Rent for Business Purpose")
+                        return _buildRentSection();
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12),
+                        child: IncomeField(controller: ctrl, label: label),
+                      );
+                    }),
+                  ],
+                )
+              : Column(
+                  children: [
+                    ...List.generate(
+                      monthlyDynamicCtrls[selectedMonthIndex!].length,
+                      (j) => Padding(
+                        padding: EdgeInsets.only(bottom: 12),
+                        child: IncomeField(
+                          controller: monthlyDynamicCtrls[selectedMonthIndex!][j],
+                          label: "${widget.incomeType} ${j + 1}",
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () => addDynamicField(selectedMonthIndex!),
-                  icon: Icon(Icons.add_circle_outline),
-                  label: Text("Add ${widget.incomeType} Income"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                    SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () => addDynamicField(selectedMonthIndex!),
+                      icon: Icon(Icons.add_circle_outline),
+                      label: Text("Add ${widget.incomeType} Income"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 4,
+                        shadowColor: primaryColor.withOpacity(0.3),
+                      ),
                     ),
-                    elevation: 4,
-                    shadowColor: primaryColor.withOpacity(0.3),
-                  ),
+                  ],
                 ),
-              ],
-            ),
     );
   }
 }

@@ -1,5 +1,4 @@
 //pages/mode_selection_page.dart
-//pages/mode_selection_page.dart
 import 'package:flutter/material.dart';
 import 'income_input_page.dart';
 import 'qualifying_payments_page.dart';
@@ -513,16 +512,6 @@ class _ModeSelectionPageState extends State<ModeSelectionPage>
                                 backgroundColor: primaryColor,
                                 icon: Icons.assessment_rounded,
                               ),
-
-                              if (service.selectedTaxYear == "2025/2026")
-                                _buildActionButton(
-                                  title: "Quarterly Installment Payment",
-                                  onPressed: () {
-                                    // TODO: Navigate to Quarterly Installment Payment page
-                                  },
-                                  backgroundColor: Color(0xFF1976D2),
-                                  icon: Icons.schedule_rounded,
-                                ),
                             ],
                           ),
                         ),
