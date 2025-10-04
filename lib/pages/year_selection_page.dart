@@ -2,9 +2,7 @@
 import 'package:flutter/material.dart';
 import 'mode_selection_page.dart';
 import '../services/tax_data_service.dart';
-
 import '../services/firestore_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class YearSelectionPage extends StatefulWidget {
   const YearSelectionPage({super.key});
@@ -32,44 +30,73 @@ class _YearSelectionPageState extends State<YearSelectionPage>
     super.initState();
 
     FirestoreService.getUserData().listen((snapshot) {
-  if (snapshot.exists) {
-    final data = snapshot.data() as Map<String, dynamic>;
-    // Update TaxDataService with loaded data
-    service.selectedTaxYear = data['selectedTaxYear'] ?? '2024/2025';
-    service.charity = (data['charity'] as num?)?.toDouble() ?? 0.0;
-    service.govDonations = (data['govDonations'] as num?)?.toDouble() ?? 0.0;
-    service.presidentsFund = (data['presidentsFund'] as num?)?.toDouble() ?? 0.0;
-    service.femaleShop = (data['femaleShop'] as num?)?.toDouble() ?? 0.0;
-    service.filmExpenditure = (data['filmExpenditure'] as num?)?.toDouble() ?? 0.0;
-    service.cinemaNew = (data['cinemaNew'] as num?)?.toDouble() ?? 0.0;
-    service.cinemaUpgrade = (data['cinemaUpgrade'] as num?)?.toDouble() ?? 0.0;
-    service.exemptIncome = (data['exemptIncome'] as num?)?.toDouble() ?? 0.0;
-    service.foreignTaxCredits = (data['foreignTaxCredits'] as num?)?.toDouble() ?? 0.0;
-    service.totalDomesticIncome = (data['totalDomesticIncome'] as num?)?.toDouble() ?? 0.0;
-    service.totalForeignIncome = (data['totalForeignIncome'] as num?)?.toDouble() ?? 0.0;
-    service.totalEmploymentIncome = (data['totalEmploymentIncome'] as num?)?.toDouble() ?? 0.0;
-    service.totalBusinessIncome = (data['totalBusinessIncome'] as num?)?.toDouble() ?? 0.0;
-    service.totalInvestmentIncome = (data['totalInvestmentIncome'] as num?)?.toDouble() ?? 0.0;
-    service.totalRentIncome = (data['totalRentIncome'] as num?)?.toDouble() ?? 0.0;
-    service.rentBusinessIncome = (data['rentBusinessIncome'] as num?)?.toDouble() ?? 0.0;
-    service.rentBusinessWht = (data['rentBusinessWht'] as num?)?.toDouble() ?? 0.0;
-    service.totalSolarIncome = (data['totalSolarIncome'] as num?)?.toDouble() ?? 0.0;
-    service.totalOtherIncome = (data['totalOtherIncome'] as num?)?.toDouble() ?? 0.0;
-    service.employmentCategories = Map<String, double>.from(data['employmentCategories'] ?? {});
-    service.businessCategories = Map<String, double>.from(data['businessCategories'] ?? {});
-    service.investmentCategories = Map<String, double>.from(data['investmentCategories'] ?? {});
-    service.foreignIncomeCategories = Map<String, double>.from(data['foreignIncomeCategories'] ?? {});
-    service.apitAmount = (data['apitAmount'] as num?)?.toDouble() ?? 0.0;
-    service.rentMaintainedByUser = data['rentMaintainedByUser'] ?? false;
-    service.solarInstallCost = (data['solarInstallCost'] as num?)?.toDouble() ?? 0.0;
-    service.solarReliefCount = (data['solarReliefCount'] as num?)?.toInt() ?? 0;
-    service.rentRelief = (data['rentRelief'] as num?)?.toDouble() ?? 0.0;
-    service.solarPanel = (data['solarPanel'] as num?)?.toDouble() ?? 0.0;
-    service.isMaintainedByUser = data['isMaintainedByUser'];
-    setState(() {});  // Refresh UI if needed
-  }
-});
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        // Update TaxDataService with loaded data
+        service.selectedTaxYear = data['selectedTaxYear'] ?? '2024/2025';
+        service.charity = (data['charity'] as num?)?.toDouble() ?? 0.0;
+        service.govDonations =
+            (data['govDonations'] as num?)?.toDouble() ?? 0.0;
+        service.presidentsFund =
+            (data['presidentsFund'] as num?)?.toDouble() ?? 0.0;
+        service.femaleShop = (data['femaleShop'] as num?)?.toDouble() ?? 0.0;
+        service.filmExpenditure =
+            (data['filmExpenditure'] as num?)?.toDouble() ?? 0.0;
+        service.cinemaNew = (data['cinemaNew'] as num?)?.toDouble() ?? 0.0;
+        service.cinemaUpgrade =
+            (data['cinemaUpgrade'] as num?)?.toDouble() ?? 0.0;
+        service.exemptIncome =
+            (data['exemptIncome'] as num?)?.toDouble() ?? 0.0;
+        service.foreignTaxCredits =
+            (data['foreignTaxCredits'] as num?)?.toDouble() ?? 0.0;
+        service.totalDomesticIncome =
+            (data['totalDomesticIncome'] as num?)?.toDouble() ?? 0.0;
+        service.totalForeignIncome =
+            (data['totalForeignIncome'] as num?)?.toDouble() ?? 0.0;
+        service.totalEmploymentIncome =
+            (data['totalEmploymentIncome'] as num?)?.toDouble() ?? 0.0;
+        service.totalBusinessIncome =
+            (data['totalBusinessIncome'] as num?)?.toDouble() ?? 0.0;
+        service.totalInvestmentIncome =
+            (data['totalInvestmentIncome'] as num?)?.toDouble() ?? 0.0;
+        service.totalRentIncome =
+            (data['totalRentIncome'] as num?)?.toDouble() ?? 0.0;
+        service.rentBusinessIncome =
+            (data['rentBusinessIncome'] as num?)?.toDouble() ?? 0.0;
+        service.rentBusinessWht =
+            (data['rentBusinessWht'] as num?)?.toDouble() ?? 0.0;
+        service.totalSolarIncome =
+            (data['totalSolarIncome'] as num?)?.toDouble() ?? 0.0;
+        service.totalOtherIncome =
+            (data['totalOtherIncome'] as num?)?.toDouble() ?? 0.0;
+        service.employmentCategories = Map<String, double>.from(
+          data['employmentCategories'] ?? {},
+        );
+        service.businessCategories = Map<String, double>.from(
+          data['businessCategories'] ?? {},
+        );
+        service.investmentCategories = Map<String, double>.from(
+          data['investmentCategories'] ?? {},
+        );
+        service.foreignIncomeCategories = Map<String, double>.from(
+          data['foreignIncomeCategories'] ?? {},
+        );
+        service.apitAmount = (data['apitAmount'] as num?)?.toDouble() ?? 0.0;
+        service.rentMaintainedByUser = data['rentMaintainedByUser'] ?? false;
+        service.solarInstallCost =
+            (data['solarInstallCost'] as num?)?.toDouble() ?? 0.0;
+        service.solarReliefCount =
+            (data['solarReliefCount'] as num?)?.toInt() ?? 0;
+        service.rentRelief = (data['rentRelief'] as num?)?.toDouble() ?? 0.0;
+        service.solarPanel = (data['solarPanel'] as num?)?.toDouble() ?? 0.0;
+        service.isMaintainedByUser = data['isMaintainedByUser'];
+        setState(() {}); // Refresh UI if needed
 
+        
+
+
+      }
+    });
 
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -152,6 +179,11 @@ class _YearSelectionPageState extends State<YearSelectionPage>
 
     // Save selected year to TaxDataService
     service.selectedTaxYear = selectedYear!;
+
+    // Save selected year to Firestore
+    await FirestoreService.saveCalculatorData({
+      'selectedTaxYear': selectedYear,
+    });
 
     // Simulate processing delay for better UX
     await Future.delayed(const Duration(milliseconds: 1000));

@@ -35,8 +35,9 @@ class IncomeApp extends StatelessWidget {
       home: StreamBuilder<User?>(
         stream: AuthService.authStateChanges, // Use AuthService
         builder: (context, snapshot) {
-          print('Snapshot state: ${snapshot.connectionState}, hasData: ${snapshot.hasData}, user: ${snapshot.data?.uid}');
-          
+          print(
+            'Snapshot state: ${snapshot.connectionState}, hasData: ${snapshot.hasData}, user: ${snapshot.data?.uid}',
+          );
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

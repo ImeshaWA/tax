@@ -1,5 +1,4 @@
 //pages/qualifying_payment_page.dart
-//pages/qualifying_payment_page.dart
 import 'package:flutter/material.dart';
 import '../widgets/income_field.dart';
 import '../services/tax_data_service.dart';

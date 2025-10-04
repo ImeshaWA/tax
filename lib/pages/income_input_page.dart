@@ -14,7 +14,8 @@ class IncomeInputPage extends StatefulWidget {
   State<IncomeInputPage> createState() => _IncomeInputPageState();
 }
 
-class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderStateMixin {
+class _IncomeInputPageState extends State<IncomeInputPage>
+    with TickerProviderStateMixin {
   final List<String> months = [
     "April",
     "May",
@@ -110,9 +111,10 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
-    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _fadeController.forward();
     _slideController.forward();
@@ -123,14 +125,22 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
       };
       monthlyEmploymentCtrls = List.generate(
         12,
-        (monthIndex) => employmentCategories.map((cat) => {
-              cat: TextEditingController(
-                text: service.monthlyEmploymentCategories[monthIndex][cat] != null &&
-                    service.monthlyEmploymentCategories[monthIndex][cat]! >= 0
-                    ? service.monthlyEmploymentCategories[monthIndex][cat]!.toStringAsFixed(2)
-                    : '',
-              ),
-            }).toList(),
+        (monthIndex) => employmentCategories
+            .map(
+              (cat) => {
+                cat: TextEditingController(
+                  text:
+                      service.monthlyEmploymentCategories[monthIndex][cat] !=
+                              null &&
+                          service.monthlyEmploymentCategories[monthIndex][cat]! >=
+                              0
+                      ? service.monthlyEmploymentCategories[monthIndex][cat]!
+                            .toStringAsFixed(2)
+                      : '',
+                ),
+              },
+            )
+            .toList(),
       );
       monthlyApitCtrls = List.generate(12, (_) => TextEditingController());
     } else if (widget.incomeType == "Business") {
@@ -139,29 +149,41 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
       };
       monthlyBusinessCtrls = List.generate(
         12,
-        (monthIndex) => businessCategories.map((cat) => {
-              cat: TextEditingController(
-                text: service.monthlyBusinessCategories[monthIndex][cat] != null &&
-                    service.monthlyBusinessCategories[monthIndex][cat]! >= 0
-                    ? service.monthlyBusinessCategories[monthIndex][cat]!.toStringAsFixed(2)
-                    : '',
-              ),
-            }).toList(),
+        (monthIndex) => businessCategories
+            .map(
+              (cat) => {
+                cat: TextEditingController(
+                  text:
+                      service.monthlyBusinessCategories[monthIndex][cat] !=
+                              null &&
+                          service.monthlyBusinessCategories[monthIndex][cat]! >=
+                              0
+                      ? service.monthlyBusinessCategories[monthIndex][cat]!
+                            .toStringAsFixed(2)
+                      : '',
+                ),
+              },
+            )
+            .toList(),
       );
       monthlyRentBusinessIncomeCtrls = List.generate(
         12,
         (monthIndex) => TextEditingController(
-          text: service.monthlyRentBusinessIncome[monthIndex] != null &&
-              service.monthlyRentBusinessIncome[monthIndex]! >= 0
-              ? service.monthlyRentBusinessIncome[monthIndex]!.toStringAsFixed(2)
+          text:
+              service.monthlyRentBusinessIncome[monthIndex] != null &&
+                  service.monthlyRentBusinessIncome[monthIndex]! >= 0
+              ? service.monthlyRentBusinessIncome[monthIndex]!.toStringAsFixed(
+                  2,
+                )
               : '',
         ),
       );
       monthlyRentBusinessWhtCtrls = List.generate(
         12,
         (monthIndex) => TextEditingController(
-          text: service.monthlyRentBusinessWht[monthIndex] != null &&
-              service.monthlyRentBusinessWht[monthIndex]! >= 0
+          text:
+              service.monthlyRentBusinessWht[monthIndex] != null &&
+                  service.monthlyRentBusinessWht[monthIndex]! >= 0
               ? service.monthlyRentBusinessWht[monthIndex]!.toStringAsFixed(2)
               : '',
         ),
@@ -174,12 +196,27 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
       monthlyDynamicCtrls = List.generate(
         12,
         (monthIndex) => List.generate(
-          service.monthlyInvestmentCategories[monthIndex][widget.incomeType]?.length ?? 1,
+          service
+                  .monthlyInvestmentCategories[monthIndex][widget.incomeType]
+                  ?.length ??
+              1,
           (index) => TextEditingController(
-            text: service.monthlyInvestmentCategories[monthIndex][widget.incomeType] != null &&
-                service.monthlyInvestmentCategories[monthIndex][widget.incomeType]!.length > index &&
-                service.monthlyInvestmentCategories[monthIndex][widget.incomeType]![index] >= 0
-                ? service.monthlyInvestmentCategories[monthIndex][widget.incomeType]![index].toStringAsFixed(2)
+            text:
+                service.monthlyInvestmentCategories[monthIndex][widget
+                            .incomeType] !=
+                        null &&
+                    service
+                            .monthlyInvestmentCategories[monthIndex][widget
+                                .incomeType]!
+                            .length >
+                        index &&
+                    service.monthlyInvestmentCategories[monthIndex][widget
+                            .incomeType]![index] >=
+                        0
+                ? service
+                      .monthlyInvestmentCategories[monthIndex][widget
+                          .incomeType]![index]
+                      .toStringAsFixed(2)
                 : '',
           ),
         ),
@@ -188,12 +225,27 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
       monthlyDynamicCtrls = List.generate(
         12,
         (monthIndex) => List.generate(
-          service.monthlyForeignCategories[monthIndex][widget.incomeType]?.length ?? 1,
+          service
+                  .monthlyForeignCategories[monthIndex][widget.incomeType]
+                  ?.length ??
+              1,
           (index) => TextEditingController(
-            text: service.monthlyForeignCategories[monthIndex][widget.incomeType] != null &&
-                service.monthlyForeignCategories[monthIndex][widget.incomeType]!.length > index &&
-                service.monthlyForeignCategories[monthIndex][widget.incomeType]![index] >= 0
-                ? service.monthlyForeignCategories[monthIndex][widget.incomeType]![index].toStringAsFixed(2)
+            text:
+                service.monthlyForeignCategories[monthIndex][widget
+                            .incomeType] !=
+                        null &&
+                    service
+                            .monthlyForeignCategories[monthIndex][widget
+                                .incomeType]!
+                            .length >
+                        index &&
+                    service.monthlyForeignCategories[monthIndex][widget
+                            .incomeType]![index] >=
+                        0
+                ? service
+                      .monthlyForeignCategories[monthIndex][widget
+                          .incomeType]![index]
+                      .toStringAsFixed(2)
                 : '',
           ),
         ),
@@ -202,11 +254,15 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
       monthlyDynamicCtrls = List.generate(
         12,
         (monthIndex) => List.generate(
-          service.monthlyOtherCategories[monthIndex].length != 0 ? service.monthlyOtherCategories[monthIndex].length : 1,
+          service.monthlyOtherCategories[monthIndex].length != 0
+              ? service.monthlyOtherCategories[monthIndex].length
+              : 1,
           (index) => TextEditingController(
-            text: service.monthlyOtherCategories[monthIndex].length > index &&
-                service.monthlyOtherCategories[monthIndex][index] >= 0
-                ? service.monthlyOtherCategories[monthIndex][index].toStringAsFixed(2)
+            text:
+                service.monthlyOtherCategories[monthIndex].length > index &&
+                    service.monthlyOtherCategories[monthIndex][index] >= 0
+                ? service.monthlyOtherCategories[monthIndex][index]
+                      .toStringAsFixed(2)
                 : '',
           ),
         ),
@@ -248,7 +304,9 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
   }
 
   void addDynamicField(int monthIndex) {
-    setState(() => monthlyDynamicCtrls[monthIndex].add(TextEditingController()));
+    setState(
+      () => monthlyDynamicCtrls[monthIndex].add(TextEditingController()),
+    );
   }
 
   void saveIncome() async {
@@ -284,12 +342,16 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
         apitAmount = monthlyApitCtrls
             .map((c) => double.tryParse(c.text) ?? 0.0)
             .fold(0.0, (a, b) => a + b);
-        if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") && selectedMonthIndex != null) {
+        if ((service.selectedTaxYear == "2024/2025" ||
+                service.selectedTaxYear == "2025/2026") &&
+            selectedMonthIndex != null) {
           double monthTotal = 0.0;
           for (var catMap in monthlyEmploymentCtrls[selectedMonthIndex!]) {
             final category = catMap.keys.first;
             final value = double.tryParse(catMap.values.first.text) ?? 0.0;
-            service.monthlyEmploymentCategories[selectedMonthIndex!][category] = value;
+
+            service.monthlyEmploymentCategories[selectedMonthIndex!][category] =
+                value;
             monthTotal += value;
           }
           service.monthlyEmploymentTotals[selectedMonthIndex!] = monthTotal;
@@ -301,69 +363,99 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
         rentWht = monthlyRentBusinessWhtCtrls
             .map((c) => double.tryParse(c.text) ?? 0.0)
             .fold(0.0, (a, b) => a + b);
-        maintainedByUser = monthlyRentMaintainedByUser.any((val) => val == "Yes");
+        maintainedByUser = monthlyRentMaintainedByUser.any(
+          (val) => val == "Yes",
+        );
         service.rentBusinessIncome = rentIncome;
         service.rentBusinessWht = rentWht;
         service.rentMaintainedByUser = maintainedByUser;
-        if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") && selectedMonthIndex != null) {
+        if ((service.selectedTaxYear == "2024/2025" ||
+                service.selectedTaxYear == "2025/2026") &&
+            selectedMonthIndex != null) {
           double monthTotal = monthlyBusinessCtrls[selectedMonthIndex!].fold(
             0.0,
-            (sum, catMap) => sum + (double.tryParse(catMap.values.first.text) ?? 0.0),
+            (sum, catMap) =>
+                sum + (double.tryParse(catMap.values.first.text) ?? 0.0),
           );
-          monthTotal += double.tryParse(monthlyRentBusinessIncomeCtrls[selectedMonthIndex!].text) ?? 0.0;
+          monthTotal +=
+              double.tryParse(
+                monthlyRentBusinessIncomeCtrls[selectedMonthIndex!].text,
+              ) ??
+              0.0;
           service.monthlyBusinessTotals[selectedMonthIndex!] = monthTotal;
           for (var catMap in monthlyBusinessCtrls[selectedMonthIndex!]) {
             final category = catMap.keys.first;
             final value = double.tryParse(catMap.values.first.text) ?? 0.0;
-            service.monthlyBusinessCategories[selectedMonthIndex!][category] = value;
+            service.monthlyBusinessCategories[selectedMonthIndex!][category] =
+                value;
           }
           service.monthlyRentBusinessIncome[selectedMonthIndex!] =
-              double.tryParse(monthlyRentBusinessIncomeCtrls[selectedMonthIndex!].text) ?? 0.0;
+              double.tryParse(
+                monthlyRentBusinessIncomeCtrls[selectedMonthIndex!].text,
+              ) ??
+              0.0;
           service.monthlyRentBusinessWht[selectedMonthIndex!] =
-              double.tryParse(monthlyRentBusinessWhtCtrls[selectedMonthIndex!].text) ?? 0.0;
-          service.monthlyRentMaintainedByUser[selectedMonthIndex!] = monthlyRentMaintainedByUser[selectedMonthIndex!];
+              double.tryParse(
+                monthlyRentBusinessWhtCtrls[selectedMonthIndex!].text,
+              ) ??
+              0.0;
+          service.monthlyRentMaintainedByUser[selectedMonthIndex!] =
+              monthlyRentMaintainedByUser[selectedMonthIndex!];
         }
       } else if (investmentCategories.contains(widget.incomeType)) {
-        if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") && selectedMonthIndex != null) {
+        if ((service.selectedTaxYear == "2024/2025" ||
+                service.selectedTaxYear == "2025/2026") &&
+            selectedMonthIndex != null) {
           double monthTotal = monthlyDynamicCtrls[selectedMonthIndex!]
               .map((c) => double.tryParse(c.text) ?? 0.0)
               .fold(0.0, (sum, value) => sum + value);
           service.monthlyInvestmentTotals[selectedMonthIndex!] = monthTotal;
-          service.monthlyInvestmentCategories[selectedMonthIndex!][widget.incomeType] = monthlyDynamicCtrls[selectedMonthIndex!]
+
+          service.monthlyInvestmentCategories[selectedMonthIndex!][widget
+              .incomeType] = monthlyDynamicCtrls[selectedMonthIndex!]
               .map((c) => double.tryParse(c.text) ?? 0.0)
               .toList();
         }
       } else if (foreignCategories.contains(widget.incomeType)) {
-        if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") && selectedMonthIndex != null) {
+        if ((service.selectedTaxYear == "2024/2025" ||
+                service.selectedTaxYear == "2025/2026") &&
+            selectedMonthIndex != null) {
           double monthTotal = monthlyDynamicCtrls[selectedMonthIndex!]
               .map((c) => double.tryParse(c.text) ?? 0.0)
               .fold(0.0, (sum, value) => sum + value);
           service.monthlyForeignTotals[selectedMonthIndex!] = monthTotal;
-          service.monthlyForeignCategories[selectedMonthIndex!][widget.incomeType] = monthlyDynamicCtrls[selectedMonthIndex!]
+
+          service.monthlyForeignCategories[selectedMonthIndex!][widget
+              .incomeType] = monthlyDynamicCtrls[selectedMonthIndex!]
               .map((c) => double.tryParse(c.text) ?? 0.0)
               .toList();
         }
       } else if (widget.incomeType == "Other") {
-        if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") && selectedMonthIndex != null) {
+        if ((service.selectedTaxYear == "2024/2025" ||
+                service.selectedTaxYear == "2025/2026") &&
+            selectedMonthIndex != null) {
           double monthTotal = monthlyDynamicCtrls[selectedMonthIndex!]
               .map((c) => double.tryParse(c.text) ?? 0.0)
               .fold(0.0, (sum, value) => sum + value);
           service.monthlyOtherTotals[selectedMonthIndex!] = monthTotal;
-          service.monthlyOtherCategories[selectedMonthIndex!] = monthlyDynamicCtrls[selectedMonthIndex!]
-              .map((c) => double.tryParse(c.text) ?? 0.0)
-              .toList();
+          service.monthlyOtherCategories[selectedMonthIndex!] =
+              monthlyDynamicCtrls[selectedMonthIndex!]
+                  .map((c) => double.tryParse(c.text) ?? 0.0)
+                  .toList();
         }
       }
     }
 
-    if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") &&
+    if ((service.selectedTaxYear == "2024/2025" ||
+            service.selectedTaxYear == "2025/2026") &&
         selectedMode == "Monthly" &&
         widget.incomeType == "Employment" &&
         selectedMonthIndex == null) {
       for (int i = 0; i < 12; i++) {
         double monthTotal = monthlyEmploymentCtrls[i].fold(
           0.0,
-          (sum, catMap) => sum + (double.tryParse(catMap.values.first.text) ?? 0.0),
+          (sum, catMap) =>
+              sum + (double.tryParse(catMap.values.first.text) ?? 0.0),
         );
         service.monthlyEmploymentTotals[i] = monthTotal;
         for (var catMap in monthlyEmploymentCtrls[i]) {
@@ -374,29 +466,35 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
       }
     }
 
-    if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") &&
+    if ((service.selectedTaxYear == "2024/2025" ||
+            service.selectedTaxYear == "2025/2026") &&
         selectedMode == "Monthly" &&
         widget.incomeType == "Business" &&
         selectedMonthIndex == null) {
       for (int i = 0; i < 12; i++) {
         double monthTotal = monthlyBusinessCtrls[i].fold(
           0.0,
-          (sum, catMap) => sum + (double.tryParse(catMap.values.first.text) ?? 0.0),
+          (sum, catMap) =>
+              sum + (double.tryParse(catMap.values.first.text) ?? 0.0),
         );
-        monthTotal += double.tryParse(monthlyRentBusinessIncomeCtrls[i].text) ?? 0.0;
+        monthTotal +=
+            double.tryParse(monthlyRentBusinessIncomeCtrls[i].text) ?? 0.0;
         service.monthlyBusinessTotals[i] = monthTotal;
         for (var catMap in monthlyBusinessCtrls[i]) {
           final category = catMap.keys.first;
           final value = double.tryParse(catMap.values.first.text) ?? 0.0;
           service.monthlyBusinessCategories[i][category] = value;
         }
-        service.monthlyRentBusinessIncome[i] = double.tryParse(monthlyRentBusinessIncomeCtrls[i].text) ?? 0.0;
-        service.monthlyRentBusinessWht[i] = double.tryParse(monthlyRentBusinessWhtCtrls[i].text) ?? 0.0;
+        service.monthlyRentBusinessIncome[i] =
+            double.tryParse(monthlyRentBusinessIncomeCtrls[i].text) ?? 0.0;
+        service.monthlyRentBusinessWht[i] =
+            double.tryParse(monthlyRentBusinessWhtCtrls[i].text) ?? 0.0;
         service.monthlyRentMaintainedByUser[i] = monthlyRentMaintainedByUser[i];
       }
     }
 
-    if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") &&
+    if ((service.selectedTaxYear == "2024/2025" ||
+            service.selectedTaxYear == "2025/2026") &&
         selectedMode == "Monthly" &&
         investmentCategories.contains(widget.incomeType) &&
         selectedMonthIndex == null) {
@@ -405,13 +503,15 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
             .map((c) => double.tryParse(c.text) ?? 0.0)
             .fold(0.0, (sum, value) => sum + value);
         service.monthlyInvestmentTotals[i] = monthTotal;
-        service.monthlyInvestmentCategories[i][widget.incomeType] = monthlyDynamicCtrls[i]
-            .map((c) => double.tryParse(c.text) ?? 0.0)
-            .toList();
+        service.monthlyInvestmentCategories[i][widget.incomeType] =
+            monthlyDynamicCtrls[i]
+                .map((c) => double.tryParse(c.text) ?? 0.0)
+                .toList();
       }
     }
 
-    if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") &&
+    if ((service.selectedTaxYear == "2024/2025" ||
+            service.selectedTaxYear == "2025/2026") &&
         selectedMode == "Monthly" &&
         foreignCategories.contains(widget.incomeType) &&
         selectedMonthIndex == null) {
@@ -420,13 +520,15 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
             .map((c) => double.tryParse(c.text) ?? 0.0)
             .fold(0.0, (sum, value) => sum + value);
         service.monthlyForeignTotals[i] = monthTotal;
-        service.monthlyForeignCategories[i][widget.incomeType] = monthlyDynamicCtrls[i]
-            .map((c) => double.tryParse(c.text) ?? 0.0)
-            .toList();
+        service.monthlyForeignCategories[i][widget.incomeType] =
+            monthlyDynamicCtrls[i]
+                .map((c) => double.tryParse(c.text) ?? 0.0)
+                .toList();
       }
     }
 
-    if ((service.selectedTaxYear == "2024/2025" || service.selectedTaxYear == "2025/2026") &&
+    if ((service.selectedTaxYear == "2024/2025" ||
+            service.selectedTaxYear == "2025/2026") &&
         selectedMode == "Monthly" &&
         widget.incomeType == "Other" &&
         selectedMonthIndex == null) {
@@ -532,7 +634,13 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
       return total;
     } else {
       return IncomeCalculator.calculateAnnualDynamic(
-        monthlyDynamicCtrls.map((monthCtrls) => monthCtrls.map((c) => double.tryParse(c.text) ?? 0.0).toList()).toList(),
+        monthlyDynamicCtrls
+            .map(
+              (monthCtrls) => monthCtrls
+                  .map((c) => double.tryParse(c.text) ?? 0.0)
+                  .toList(),
+            )
+            .toList(),
       );
     }
   }
@@ -632,7 +740,9 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
                 color: selected ? null : neutral50,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: selected ? primaryColor : primaryColor.withOpacity(0.3),
+                  color: selected
+                      ? primaryColor
+                      : primaryColor.withOpacity(0.3),
                   width: selected ? 2 : 1,
                 ),
                 boxShadow: selected
@@ -674,13 +784,15 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
     const neutral300 = Color(0xFFdce5df);
     const neutral900 = Color(0xFF111714);
 
-    final rentIncomeCtrl = selectedMode == "Monthly" && selectedMonthIndex != null
+    final rentIncomeCtrl =
+        selectedMode == "Monthly" && selectedMonthIndex != null
         ? monthlyRentBusinessIncomeCtrls[selectedMonthIndex!]
         : rentBusinessIncomeCtrl;
     final rentWhtCtrl = selectedMode == "Monthly" && selectedMonthIndex != null
         ? monthlyRentBusinessWhtCtrls[selectedMonthIndex!]
         : rentBusinessWhtCtrl;
-    final maintainedByUser = selectedMode == "Monthly" && selectedMonthIndex != null
+    final maintainedByUser =
+        selectedMode == "Monthly" && selectedMonthIndex != null
         ? monthlyRentMaintainedByUser[selectedMonthIndex!]
         : rentMaintainedByUser;
 
@@ -770,10 +882,17 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
                       color: neutral900,
                       fontWeight: FontWeight.w500,
                     ),
-                    items: ["Yes", "No"].map((val) => DropdownMenuItem(value: val, child: Text(val))).toList(),
+                    items: ["Yes", "No"]
+                        .map(
+                          (val) =>
+                              DropdownMenuItem(value: val, child: Text(val)),
+                        )
+                        .toList(),
                     onChanged: (val) => setState(() {
-                      if (selectedMode == "Monthly" && selectedMonthIndex != null) {
-                        monthlyRentMaintainedByUser[selectedMonthIndex!] = val ?? "No";
+                      if (selectedMode == "Monthly" &&
+                          selectedMonthIndex != null) {
+                        monthlyRentMaintainedByUser[selectedMonthIndex!] =
+                            val ?? "No";
                       } else {
                         rentMaintainedByUser = val ?? "No";
                       }
@@ -825,7 +944,9 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: primaryColor.withOpacity(0.2)),
+                            border: Border.all(
+                              color: primaryColor.withOpacity(0.2),
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.05),
@@ -876,51 +997,55 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
                   child: selectedMode == "Annual"
                       ? _buildAnnualView()
                       : selectedMonthIndex != null
-                          ? _buildMonthlyView()
-                          : Center(
-                              child: Container(
-                                padding: EdgeInsets.all(32),
-                                margin: EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: primaryColor.withOpacity(0.2)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 15,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(colors: [primaryColor, accentGreen]),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.calendar_month_rounded,
-                                        color: Colors.white,
-                                        size: 32,
-                                      ),
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      "Select a month to continue",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black54,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                      ? _buildMonthlyView()
+                      : Center(
+                          child: Container(
+                            padding: EdgeInsets.all(32),
+                            margin: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: primaryColor.withOpacity(0.2),
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 15,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
                             ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [primaryColor, accentGreen],
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.calendar_month_rounded,
+                                    color: Colors.white,
+                                    size: 32,
+                                  ),
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  "Select a month to continue",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                 ),
               ],
             ),
@@ -959,7 +1084,11 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
                   margin: EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.transparent, Color(0xFF38E07B), Colors.transparent],
+                      colors: [
+                        Colors.transparent,
+                        Color(0xFF38E07B),
+                        Colors.transparent,
+                      ],
                     ),
                   ),
                 ),
@@ -967,28 +1096,29 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
               ],
             )
           : widget.incomeType == "Business"
-              ? Column(
-                  children: [
-                    ...annualBusinessCtrls.keys.map((label) {
-                      if (label == "Rent for Business Purpose") return _buildRentSection();
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: 12),
-                        child: IncomeField(
-                          controller: annualBusinessCtrls[label]!,
-                          label: label,
-                        ),
-                      );
-                    }),
-                  ],
-                )
-              : Column(
-                  children: [
-                    IncomeField(
-                      controller: annualCtrl,
-                      label: "${widget.incomeType} Income (Annual)",
+          ? Column(
+              children: [
+                ...annualBusinessCtrls.keys.map((label) {
+                  if (label == "Rent for Business Purpose")
+                    return _buildRentSection();
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: IncomeField(
+                      controller: annualBusinessCtrls[label]!,
+                      label: label,
                     ),
-                  ],
+                  );
+                }),
+              ],
+            )
+          : Column(
+              children: [
+                IncomeField(
+                  controller: annualCtrl,
+                  label: "${widget.incomeType} Income (Annual)",
                 ),
+              ],
+            ),
     );
   }
 
@@ -1014,7 +1144,11 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
                   margin: EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.transparent, primaryColor, Colors.transparent],
+                      colors: [
+                        Colors.transparent,
+                        primaryColor,
+                        Colors.transparent,
+                      ],
                     ),
                   ),
                 ),
@@ -1025,49 +1159,50 @@ class _IncomeInputPageState extends State<IncomeInputPage> with TickerProviderSt
               ],
             )
           : widget.incomeType == "Business"
-              ? Column(
-                  children: [
-                    ...monthlyBusinessCtrls[selectedMonthIndex!].map((catMap) {
-                      final label = catMap.keys.first;
-                      final ctrl = catMap.values.first;
-                      if (label == "Rent for Business Purpose") return _buildRentSection();
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: 12),
-                        child: IncomeField(controller: ctrl, label: label),
-                      );
-                    }),
-                  ],
-                )
-              : Column(
-                  children: [
-                    ...List.generate(
-                      monthlyDynamicCtrls[selectedMonthIndex!].length,
-                      (j) => Padding(
-                        padding: EdgeInsets.only(bottom: 12),
-                        child: IncomeField(
-                          controller: monthlyDynamicCtrls[selectedMonthIndex!][j],
-                          label: "${widget.incomeType} ${j + 1}",
-                        ),
-                      ),
+          ? Column(
+              children: [
+                ...monthlyBusinessCtrls[selectedMonthIndex!].map((catMap) {
+                  final label = catMap.keys.first;
+                  final ctrl = catMap.values.first;
+                  if (label == "Rent for Business Purpose")
+                    return _buildRentSection();
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: IncomeField(controller: ctrl, label: label),
+                  );
+                }),
+              ],
+            )
+          : Column(
+              children: [
+                ...List.generate(
+                  monthlyDynamicCtrls[selectedMonthIndex!].length,
+                  (j) => Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: IncomeField(
+                      controller: monthlyDynamicCtrls[selectedMonthIndex!][j],
+                      label: "${widget.incomeType} ${j + 1}",
                     ),
-                    SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: () => addDynamicField(selectedMonthIndex!),
-                      icon: Icon(Icons.add_circle_outline),
-                      label: Text("Add ${widget.incomeType} Income"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
-                        shadowColor: primaryColor.withOpacity(0.3),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
+                SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => addDynamicField(selectedMonthIndex!),
+                  icon: Icon(Icons.add_circle_outline),
+                  label: Text("Add ${widget.incomeType} Income"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 4,
+                    shadowColor: primaryColor.withOpacity(0.3),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

@@ -1,4 +1,3 @@
-//services/tax_data_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TaxDataService {
@@ -194,6 +193,11 @@ class TaxDataService {
   }
 
   Map<String, dynamic> getAllDataAsMap() {
+    Map<String, dynamic> monthlyOtherMap = {};
+    for (int i = 0; i < monthlyOtherCategories.length; i++) {
+      monthlyOtherMap['month_${i + 1}'] = monthlyOtherCategories[i];
+    }
+
     return {
       'selectedTaxYear': selectedTaxYear,
       'charity': charity,
@@ -226,7 +230,7 @@ class TaxDataService {
       'monthlyInvestmentCategories': monthlyInvestmentCategories,
       'foreignIncomeCategories': foreignIncomeCategories,
       'monthlyForeignCategories': monthlyForeignCategories,
-      'monthlyOtherCategories': monthlyOtherCategories,
+      'monthlyOtherCategories': monthlyOtherMap,
       'apitAmount': apitAmount,
       'rentMaintainedByUser': rentMaintainedByUser,
       'solarInstallCost': solarInstallCost,
@@ -241,5 +245,60 @@ class TaxDataService {
       'monthlyOtherTotals': monthlyOtherTotals,
       'updatedAt': FieldValue.serverTimestamp(),
     };
+  }
+
+  void loadFromMap(Map<String, dynamic> data) {
+    selectedTaxYear = data['selectedTaxYear'] ?? "2024/2025";
+    charity = (data['charity'] as num?)?.toDouble() ?? 0.0;
+    govDonations = (data['govDonations'] as num?)?.toDouble() ?? 0.0;
+    presidentsFund = (data['presidentsFund'] as num?)?.toDouble() ?? 0.0;
+    femaleShop = (data['femaleShop'] as num?)?.toDouble() ?? 0.0;
+    filmExpenditure = (data['filmExpenditure'] as num?)?.toDouble() ?? 0.0;
+    cinemaNew = (data['cinemaNew'] as num?)?.toDouble() ?? 0.0;
+    cinemaUpgrade = (data['cinemaUpgrade'] as num?)?.toDouble() ?? 0.0;
+    exemptIncome = (data['exemptIncome'] as num?)?.toDouble() ?? 0.0;
+    foreignTaxCredits = (data['foreignTaxCredits'] as num?)?.toDouble() ?? 0.0;
+    totalDomesticIncome = (data['totalDomesticIncome'] as num?)?.toDouble() ?? 0.0;
+    totalForeignIncome = (data['totalForeignIncome'] as num?)?.toDouble() ?? 0.0;
+    totalEmploymentIncome = (data['totalEmploymentIncome'] as num?)?.toDouble() ?? 0.0;
+    totalBusinessIncome = (data['totalBusinessIncome'] as num?)?.toDouble() ?? 0.0;
+    totalInvestmentIncome = (data['totalInvestmentIncome'] as num?)?.toDouble() ?? 0.0;
+    totalRentIncome = (data['totalRentIncome'] as num?)?.toDouble() ?? 0.0;
+    rentBusinessIncome = (data['rentBusinessIncome'] as num?)?.toDouble() ?? 0.0;
+    rentBusinessWht = (data['rentBusinessWht'] as num?)?.toDouble() ?? 0.0;
+    totalSolarIncome = (data['totalSolarIncome'] as num?)?.toDouble() ?? 0.0;
+    totalOtherIncome = (data['totalOtherIncome'] as num?)?.toDouble() ?? 0.0;
+    employmentCategories = Map<String, double>.from(data['employmentCategories'] ?? {});
+    monthlyEmploymentCategories = (data['monthlyEmploymentCategories'] as List? ?? []).map((item) => Map<String, double>.from(item as Map)).toList();
+    businessCategories = Map<String, double>.from(data['businessCategories'] ?? {});
+    monthlyBusinessCategories = (data['monthlyBusinessCategories'] as List? ?? []).map((item) => Map<String, double>.from(item as Map)).toList();
+    monthlyRentBusinessIncome = (data['monthlyRentBusinessIncome'] as List? ?? []).map((item) => (item as num).toDouble()).toList();
+    monthlyRentBusinessWht = (data['monthlyRentBusinessWht'] as List? ?? []).map((item) => (item as num).toDouble()).toList();
+    monthlyRentMaintainedByUser = (data['monthlyRentMaintainedByUser'] as List? ?? []).cast<String>();
+    investmentCategories = Map<String, double>.from(data['investmentCategories'] ?? {});
+    monthlyInvestmentCategories = (data['monthlyInvestmentCategories'] as List? ?? []).map((item) {
+      return (item as Map).map((key, value) => MapEntry(key as String, List<double>.from(value as List)));
+    }).toList();
+    foreignIncomeCategories = Map<String, double>.from(data['foreignIncomeCategories'] ?? {});
+    monthlyForeignCategories = (data['monthlyForeignCategories'] as List? ?? []).map((item) {
+      return (item as Map).map((key, value) => MapEntry(key as String, List<double>.from(value as List)));
+    }).toList();
+    final monthlyOtherMap = data['monthlyOtherCategories'] as Map<String, dynamic>? ?? {};
+    monthlyOtherCategories = List.generate(12, (i) {
+      final key = 'month_${i + 1}';
+      return List<double>.from(monthlyOtherMap[key] as List? ?? [0.0]);
+    });
+    apitAmount = (data['apitAmount'] as num?)?.toDouble() ?? 0.0;
+    rentMaintainedByUser = data['rentMaintainedByUser'] ?? false;
+    solarInstallCost = (data['solarInstallCost'] as num?)?.toDouble() ?? 0.0;
+    solarReliefCount = data['solarReliefCount'] ?? 0;
+    rentRelief = (data['rentRelief'] as num?)?.toDouble() ?? 0.0;
+    solarPanel = (data['solarPanel'] as num?)?.toDouble() ?? 0.0;
+    isMaintainedByUser = data['isMaintainedByUser'];
+    monthlyEmploymentTotals = (data['monthlyEmploymentTotals'] as List? ?? []).map((item) => (item as num).toDouble()).toList();
+    monthlyBusinessTotals = (data['monthlyBusinessTotals'] as List? ?? []).map((item) => (item as num).toDouble()).toList();
+    monthlyInvestmentTotals = (data['monthlyInvestmentTotals'] as List? ?? []).map((item) => (item as num).toDouble()).toList();
+    monthlyForeignTotals = (data['monthlyForeignTotals'] as List? ?? []).map((item) => (item as num).toDouble()).toList();
+    monthlyOtherTotals = (data['monthlyOtherTotals'] as List? ?? []).map((item) => (item as num).toDouble()).toList();
   }
 }
