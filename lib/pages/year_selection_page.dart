@@ -29,73 +29,22 @@ class _YearSelectionPageState extends State<YearSelectionPage>
   void initState() {
     super.initState();
 
-    FirestoreService.getUserData().listen((snapshot) {
-      if (snapshot.exists) {
-        final data = snapshot.data() as Map<String, dynamic>;
-        // Update TaxDataService with loaded data
-        service.selectedTaxYear = data['selectedTaxYear'] ?? '2024/2025';
-        service.charity = (data['charity'] as num?)?.toDouble() ?? 0.0;
-        service.govDonations =
-            (data['govDonations'] as num?)?.toDouble() ?? 0.0;
-        service.presidentsFund =
-            (data['presidentsFund'] as num?)?.toDouble() ?? 0.0;
-        service.femaleShop = (data['femaleShop'] as num?)?.toDouble() ?? 0.0;
-        service.filmExpenditure =
-            (data['filmExpenditure'] as num?)?.toDouble() ?? 0.0;
-        service.cinemaNew = (data['cinemaNew'] as num?)?.toDouble() ?? 0.0;
-        service.cinemaUpgrade =
-            (data['cinemaUpgrade'] as num?)?.toDouble() ?? 0.0;
-        service.exemptIncome =
-            (data['exemptIncome'] as num?)?.toDouble() ?? 0.0;
-        service.foreignTaxCredits =
-            (data['foreignTaxCredits'] as num?)?.toDouble() ?? 0.0;
-        service.totalDomesticIncome =
-            (data['totalDomesticIncome'] as num?)?.toDouble() ?? 0.0;
-        service.totalForeignIncome =
-            (data['totalForeignIncome'] as num?)?.toDouble() ?? 0.0;
-        service.totalEmploymentIncome =
-            (data['totalEmploymentIncome'] as num?)?.toDouble() ?? 0.0;
-        service.totalBusinessIncome =
-            (data['totalBusinessIncome'] as num?)?.toDouble() ?? 0.0;
-        service.totalInvestmentIncome =
-            (data['totalInvestmentIncome'] as num?)?.toDouble() ?? 0.0;
-        service.totalRentIncome =
-            (data['totalRentIncome'] as num?)?.toDouble() ?? 0.0;
-        service.rentBusinessIncome =
-            (data['rentBusinessIncome'] as num?)?.toDouble() ?? 0.0;
-        service.rentBusinessWht =
-            (data['rentBusinessWht'] as num?)?.toDouble() ?? 0.0;
-        service.totalSolarIncome =
-            (data['totalSolarIncome'] as num?)?.toDouble() ?? 0.0;
-        service.totalOtherIncome =
-            (data['totalOtherIncome'] as num?)?.toDouble() ?? 0.0;
-        service.employmentCategories = Map<String, double>.from(
-          data['employmentCategories'] ?? {},
-        );
-        service.businessCategories = Map<String, double>.from(
-          data['businessCategories'] ?? {},
-        );
-        service.investmentCategories = Map<String, double>.from(
-          data['investmentCategories'] ?? {},
-        );
-        service.foreignIncomeCategories = Map<String, double>.from(
-          data['foreignIncomeCategories'] ?? {},
-        );
-        service.apitAmount = (data['apitAmount'] as num?)?.toDouble() ?? 0.0;
-        service.rentMaintainedByUser = data['rentMaintainedByUser'] ?? false;
-        service.solarInstallCost =
-            (data['solarInstallCost'] as num?)?.toDouble() ?? 0.0;
-        service.solarReliefCount =
-            (data['solarReliefCount'] as num?)?.toInt() ?? 0;
-        service.rentRelief = (data['rentRelief'] as num?)?.toDouble() ?? 0.0;
-        service.solarPanel = (data['solarPanel'] as num?)?.toDouble() ?? 0.0;
-        service.isMaintainedByUser = data['isMaintainedByUser'];
-        setState(() {}); // Refresh UI if needed
-
-        
-
-
+    FirestoreService.getUserProfile().listen((data) {
+      service.resetToDefaults();
+      if (data.containsKey('lastSelectedTaxYear')) {
+        selectedYear = data['lastSelectedTaxYear'];
+        service.selectedTaxYear = selectedYear!;
+        FirestoreService.getTaxYearData(selectedYear!).listen((snap) {
+          if (snap.exists) {
+            service.loadFromMap(snap.data() as Map<String, dynamic>);
+          }
+          if (mounted) setState(() {});
+        });
+      } else {
+        selectedYear = taxYears[0];
+        service.selectedTaxYear = selectedYear!;
       }
+      if (mounted) setState(() {});
     });
 
     _fadeController = AnimationController(
@@ -116,7 +65,6 @@ class _YearSelectionPageState extends State<YearSelectionPage>
       CurvedAnimation(parent: _listController, curve: Curves.easeOutBack),
     );
 
-    // Create individual animations for each tax year item
     _itemControllers = taxYears
         .map(
           (year) => AnimationController(
@@ -177,38 +125,50 @@ class _YearSelectionPageState extends State<YearSelectionPage>
       _isLoading = true;
     });
 
-    // Save selected year to TaxDataService
-    service.selectedTaxYear = selectedYear!;
+    try {
+      service.selectedTaxYear = selectedYear!;
+      await FirestoreService.saveLastSelectedTaxYear(selectedYear!);
 
-    // Save selected year to Firestore
-    await FirestoreService.saveCalculatorData({
-      'selectedTaxYear': selectedYear,
-    });
+      // Reset data to defaults to clear old year's data
+      service.resetToDefaults();
 
-    // Simulate processing delay for better UX
-    await Future.delayed(const Duration(milliseconds: 1000));
+      // Load data for the selected year if it exists
+      final snap = await FirestoreService.getTaxYearData(selectedYear!).first;
+      if (snap.exists) {
+        service.loadFromMap(snap.data() as Map<String, dynamic>);
+      }
 
-    setState(() {
-      _isLoading = false;
-    });
+      // Simulate processing delay
+      await Future.delayed(const Duration(milliseconds: 1000));
 
-    // Navigate to ModeSelectionPage
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const ModeSelectionPage()),
-    );
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const ModeSelectionPage(),
+          settings: RouteSettings(arguments: selectedYear),
+          
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
   }
 
   void _onYearTap(String year, int index) {
     setState(() => selectedYear = year);
 
-    // Animate the tapped item
     _itemControllers[index].forward().then((_) {
       _itemControllers[index].reverse();
     });
-
-    // Provide haptic feedback
-    // HapticFeedback.selectionClick(); // Uncomment if you want haptic feedback
   }
 
   @override

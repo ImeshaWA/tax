@@ -592,7 +592,10 @@ class _IncomeInputPageState extends State<IncomeInputPage>
     }
 
     try {
-      await FirestoreService.saveCalculatorData(service.getAllDataAsMap());
+      await FirestoreService.saveTaxYearData(
+        service.selectedTaxYear,
+        service.getAllDataAsMap(),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

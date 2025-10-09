@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/tax_computation_service.dart'; 
 import '../services/tax_data_service.dart'; 
 import '../services/income_calculator.dart'; 
+
  
 class QuarterlyInstallmentsPage extends StatefulWidget { 
   const QuarterlyInstallmentsPage({super.key}); 
@@ -466,7 +467,7 @@ Colors.transparent,
                             summaryRow( 
                               "Total 1st Installment Investment Income", 
                               _calculateQuarterlyIncome('investment', 1), 
-                              isHighlight: true, 
+                            
                             ), 
                             summaryRow( 
                               "Total 1st Installment Other Income", 

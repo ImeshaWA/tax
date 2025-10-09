@@ -89,7 +89,7 @@ Curves.easeOutCubic),
     } 
  
     try { 
-      await FirestoreService.saveCalculatorData(service.getAllDataAsMap()); 
+      await FirestoreService.saveTaxYearData(service.selectedTaxYear, service.getAllDataAsMap()); 
     } catch (e) { 
       if (mounted) { 
         ScaffoldMessenger.of(context).showSnackBar( 
@@ -451,8 +451,7 @@ Curves.easeOutCubic),
         backgroundColor: primaryColor, 
         foregroundColor: Colors.white, 
         elevation: 8, 
-        shape: RoundedRectangleBorder(borderRadius: 
-BorderRadius.circular(20)), 
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), 
         label: Text( 
           "Save Solar Income", 
           style: TextStyle(fontWeight: FontWeight.bold), 

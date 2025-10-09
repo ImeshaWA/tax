@@ -70,8 +70,7 @@ class _InvestmentIncomePageState extends State<InvestmentIncomePage>
     ); 
     _slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero) 
         .animate( 
-          CurvedAnimation(parent: _slideController, curve: 
-Curves.easeOutCubic), 
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic), 
         ); 
  
     // Staggered animations for investment type cards 
@@ -79,9 +78,7 @@ Curves.easeOutCubic),
       investmentTypes.length, 
       (index) => AnimationController( 
         duration: Duration(milliseconds: 600), 
-        vsync: this, 
-      ), 
-    ); 
+        vsync: this, ), ); 
     _itemAnimations = _itemControllers 
         .map( 
           (controller) => Tween<double>(begin: 0.0, end: 1.0).animate( 
@@ -125,8 +122,7 @@ Curves.easeOutCubic),
     } else if (type == "Interest Income") { 
       Navigator.push( 
         context, 
-        MaterialPageRoute(builder: (context) => const 
-interest.InterestIncomePage()), 
+        MaterialPageRoute(builder: (context) => const interest.InterestIncomePage()), 
       ); 
     } else { 
       Navigator.push( 

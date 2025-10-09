@@ -31,7 +31,7 @@ class _ExemptIncomePageState extends State<ExemptIncomePage> {
     } 
  
     try { 
-      await FirestoreService.saveCalculatorData(service.getAllDataAsMap()); 
+      await FirestoreService.saveTaxYearData(service.selectedTaxYear, service.getAllDataAsMap()); 
     } catch (e) { 
       if (mounted) { 
         ScaffoldMessenger.of(context).showSnackBar( 

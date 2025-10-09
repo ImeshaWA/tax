@@ -92,75 +92,84 @@ Curves.easeOutCubic),
     }); 
   } 
  
-  void saveRent() async { 
-    double totalResident = 0.0; 
- 
-    // Resident 
-    if (residentMode == "Annual") { 
-      totalResident = double.tryParse(annualResidentCtrl.text) ?? 0.0; 
-    } else if (residentMode == "Monthly") { 
-      for (int i = 0; i < 12; i++) { 
-        for (var ctrl in monthlyResidentCtrls[i]) { 
-          totalResident += double.tryParse(ctrl.text) ?? 0.0; 
-        } 
-      } 
-    } 
- 
-    service.totalRentIncome = totalResident; 
- 
-    // Save maintenance responsibility as well 
-    service.isMaintainedByUser = isMaintainedByUser ?? false; 
- 
-    if (mounted) { 
-      ScaffoldMessenger.of(context).showSnackBar( 
-        SnackBar( 
-          content: Row( 
-            children: [ 
-              Icon(Icons.check_circle, color: Colors.white), 
-              SizedBox(width: 8), 
-              Text( 
-                "Rent income saved: Rs. ${totalResident.toStringAsFixed(2)}", 
-              ), 
-            ], 
-          ), 
-          backgroundColor: Color(0xFF10B981), 
-          behavior: SnackBarBehavior.floating, 
-          shape: RoundedRectangleBorder( 
-            borderRadius: BorderRadius.circular(12), 
-          ), 
-          margin: EdgeInsets.all(16), 
-        ), 
-      ); 
-    } 
- 
-    try { 
-      await FirestoreService.saveCalculatorData(service.getAllDataAsMap()); 
-    } catch (e) { 
-      if (mounted) { 
-        ScaffoldMessenger.of(context).showSnackBar( 
-          SnackBar( 
-            content: Row( 
-              children: [ 
-                Icon(Icons.error, color: Colors.white), 
-                SizedBox(width: 8), 
-                Expanded(child: Text("Failed to save to Firestore: $e")), 
-              ], 
-            ), 
-            backgroundColor: Colors.red.shade400, 
-            behavior: SnackBarBehavior.floating, 
-            shape: RoundedRectangleBorder( 
-              borderRadius: BorderRadius.circular(12), 
-            ), 
-            margin: EdgeInsets.all(16), 
-          ), 
-        ); 
-      } 
-    } 
- 
-    if (mounted) { 
-      Navigator.pop(context); 
-    } 
-  } 
+  void saveRent() async {
+  double totalResident = 0.0;
+
+  // Resident
+  if (residentMode == "Annual") {
+    totalResident = double.tryParse(annualResidentCtrl.text) ?? 0.0;
+    // Distribute annual amount evenly across months
+    if (service.selectedTaxYear == "2025/2026") {
+      for (int i = 0; i < 12; i++) {
+        service.monthlyInvestmentTotals[i] = totalResident / 12;
+      }
+    }
+  } else if (residentMode == "Monthly") {
+    for (int i = 0; i < 12; i++) {
+      for (var ctrl in monthlyResidentCtrls[i]) {
+        totalResident += double.tryParse(ctrl.text) ?? 0.0;
+        if (service.selectedTaxYear == "2025/2026") {
+          service.monthlyInvestmentTotals[i] += double.tryParse(ctrl.text) ?? 0.0;
+        }
+      }
+    }
+  }
+
+  service.totalRentIncome = totalResident;
+
+  // Save maintenance responsibility as well
+  service.isMaintainedByUser = isMaintainedByUser ?? false;
+
+  if (mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 8),
+            Text(
+              "Rent income saved: Rs. ${totalResident.toStringAsFixed(2)}",
+            ),
+          ],
+        ),
+        backgroundColor: Color(0xFF10B981),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  try {
+    await FirestoreService.saveTaxYearData(service.selectedTaxYear, service.getAllDataAsMap());
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 8),
+              Expanded(child: Text("Failed to save to Firestore: $e")),
+            ],
+          ),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: EdgeInsets.all(16),
+        ),
+      );
+    }
+  }
+
+  if (mounted) {
+    Navigator.pop(context);
+  }
+} 
  
   Widget _buildModeToggle() { 
     const primaryColor = Color(0xFF38E07B); 
@@ -808,8 +817,7 @@ true),
         backgroundColor: primaryColor, 
         foregroundColor: Colors.white, 
         elevation: 8, 
-        shape: RoundedRectangleBorder(borderRadius: 
-BorderRadius.circular(20)), 
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), 
         label: Text( 
           "Save Rent Income", 
           style: TextStyle(fontWeight: FontWeight.bold), 
