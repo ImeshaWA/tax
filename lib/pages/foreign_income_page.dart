@@ -85,6 +85,7 @@ class _ForeignIncomePageState extends State<ForeignIncomePage>
         if (mounted) _itemControllers[i].forward();
       });
     }
+    
 
     foreignTaxCtrl.text = service.foreignTaxCredits.toString();
   }
